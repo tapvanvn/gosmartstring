@@ -42,7 +42,7 @@ func (obj *SSBool) Extend(functionName string, sfunc IFunction) {
 	obj.parent.Extend(functionName, sfunc)
 }
 
-func (obj *SSBool) Call(context *sscontext, name string, params []IObject) IObject {
+func (obj *SSBool) Call(context *SSContext, name string, params []IObject) IObject {
 
 	return obj.parent.Call(context, name, params)
 }

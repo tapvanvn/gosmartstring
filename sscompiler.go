@@ -5,12 +5,12 @@ import (
 )
 
 type SSICompiler interface {
-	Compile(token *gotokenize.Token, ctx *sscontext)
+	Compile(token *gotokenize.Token, ctx *SSContext)
 }
 type SSCompiler struct {
 }
 
-func (compiler *SSCompiler) Compile(token *gotokenize.Token, context *sscontext) {
+func (compiler *SSCompiler) Compile(token *gotokenize.Token, context *SSContext) {
 	switch token.Type {
 	case TokenSSInstructionLink:
 
@@ -31,12 +31,12 @@ func (compiler *SSCompiler) Compile(token *gotokenize.Token, context *sscontext)
 		break
 	}
 }
-func (compiler *SSCompiler) compileLink(token *gotokenize.Token, context *sscontext) {
+func (compiler *SSCompiler) compileLink(token *gotokenize.Token, context *SSContext) {
 
 	context.HotLink = true
 }
 
-func (compiler *SSCompiler) compilePack(token *gotokenize.Token, context *sscontext) {
+func (compiler *SSCompiler) compilePack(token *gotokenize.Token, context *SSContext) {
 	subContext := context.CreateSubContext()
 	iter := token.Children.Iterator()
 	for {
@@ -48,7 +48,7 @@ func (compiler *SSCompiler) compilePack(token *gotokenize.Token, context *sscont
 	}
 }
 
-func (compiler *SSCompiler) compileDo(token *gotokenize.Token, context *sscontext) {
+func (compiler *SSCompiler) compileDo(token *gotokenize.Token, context *SSContext) {
 
 	name := token.Content
 	if len(name) > 0 {
@@ -71,27 +71,27 @@ func (compiler *SSCompiler) compileDo(token *gotokenize.Token, context *sscontex
 	}
 }
 
-func (compiler *SSCompiler) compileExport(token *gotokenize.Token, context *sscontext) {
+func (compiler *SSCompiler) compileExport(token *gotokenize.Token, context *SSContext) {
 
 }
 
-func (compiler *SSCompiler) compileIf(token *gotokenize.Token, context *sscontext) {
+func (compiler *SSCompiler) compileIf(token *gotokenize.Token, context *SSContext) {
 
 }
 
-func (compiler *SSCompiler) compileCase(token *gotokenize.Token, context *sscontext) {
+func (compiler *SSCompiler) compileCase(token *gotokenize.Token, context *SSContext) {
 
 }
 
-func (compiler *SSCompiler) compileEach(token *gotokenize.Token, context *sscontext) {
+func (compiler *SSCompiler) compileEach(token *gotokenize.Token, context *SSContext) {
 
 }
 
-func (compiler *SSCompiler) compileCount(token *gotokenize.Token, context *sscontext) {
+func (compiler *SSCompiler) compileCount(token *gotokenize.Token, context *SSContext) {
 
 }
 
-func (compiler *SSCompiler) callRegistry(name string, params []IObject, context *sscontext) {
+func (compiler *SSCompiler) callRegistry(name string, params []IObject, context *SSContext) {
 
 	var rs IObject = nil
 

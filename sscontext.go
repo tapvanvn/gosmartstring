@@ -1,8 +1,8 @@
 package gosmartstring
 
-type sscontext struct {
-	Root    *sscontext
-	Parent  *sscontext
+type SSContext struct {
+	Root    *SSContext
+	Parent  *SSContext
 	Level   int
 	Runtime *SSRuntime
 	This    IObject
@@ -12,9 +12,9 @@ type sscontext struct {
 	registries map[string]ssregistry
 }
 
-func CreateContext(runtime *SSRuntime) *sscontext {
+func CreateContext(runtime *SSRuntime) *SSContext {
 
-	ctx := &sscontext{
+	ctx := &SSContext{
 		Level:   0,
 		Parent:  nil,
 		Runtime: runtime,
@@ -25,9 +25,9 @@ func CreateContext(runtime *SSRuntime) *sscontext {
 	return ctx
 }
 
-func (ctx *sscontext) CreateSubContext() *sscontext {
+func (ctx *SSContext) CreateSubContext() *SSContext {
 
-	subContext := &sscontext{
+	subContext := &SSContext{
 
 		Level:   ctx.Level + 1,
 		Runtime: ctx.Runtime,
@@ -39,17 +39,17 @@ func (ctx *sscontext) CreateSubContext() *sscontext {
 	return subContext
 }
 
-func (ctx *sscontext) RegisterObject(name string, object IObject) {
+func (ctx *SSContext) RegisterObject(name string, object IObject) {
 
 	ctx.registries[name] = CreateObjectRegistry(object)
 }
 
-func (ctx *sscontext) RegisterFunction(name string, sfunc IFunction) {
+func (ctx *SSContext) RegisterFunction(name string, sfunc IFunction) {
 
 	ctx.registries[name] = CreateFunctionRegistry(sfunc)
 }
 
-func (ctx *sscontext) GetRegistry(name string) *ssregistry {
+func (ctx *SSContext) GetRegistry(name string) *ssregistry {
 
 	if registry, ok := ctx.registries[name]; ok {
 
@@ -62,7 +62,7 @@ func (ctx *sscontext) GetRegistry(name string) *ssregistry {
 	return ctx.Runtime.GetRegistry(name)
 }
 
-func (ctx *sscontext) StackResult(data []byte) {
+func (ctx *SSContext) StackResult(data []byte) {
 
 	ctx.Root.result = append(ctx.Root.result, data...)
 }

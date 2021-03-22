@@ -45,7 +45,7 @@ func (obj *SSArray) Extend(functionName string, sfunc IFunction) {
 	obj.parent.Extend(functionName, sfunc)
 }
 
-func (obj *SSArray) Call(context *sscontext, name string, params []IObject) IObject {
+func (obj *SSArray) Call(context *SSContext, name string, params []IObject) IObject {
 
 	if name == "add" {
 
