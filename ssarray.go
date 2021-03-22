@@ -7,21 +7,18 @@ import (
 )
 
 type SSArray struct {
-	parent *SSObject
-	stack  []IObject
+	SSObject
+	stack []IObject
 }
 
 func CreateSSArray() SSArray {
 	return SSArray{
-		parent: &SSObject{},
-		stack:  []IObject{},
+		SSObject: SSObject{},
+		stack:    []IObject{},
 	}
 }
 
 //MARK: implement IObject
-func (obj *SSArray) Parent() IObject {
-	return obj.parent
-}
 
 func (obj *SSArray) CanExport() bool {
 	return false
@@ -35,16 +32,6 @@ func (obj *SSArray) GetType() string {
 	return "ssarray"
 }
 
-func (obj *SSArray) GetExtendFunc() map[string]IFunction {
-
-	return obj.parent.GetExtendFunc()
-}
-
-func (obj *SSArray) Extend(functionName string, sfunc IFunction) {
-
-	obj.parent.Extend(functionName, sfunc)
-}
-
 func (obj *SSArray) Call(context *SSContext, name string, params []IObject) IObject {
 
 	if name == "add" {
@@ -55,7 +42,7 @@ func (obj *SSArray) Call(context *SSContext, name string, params []IObject) IObj
 
 		return obj.random()
 	}
-	return obj.parent.Call(context, name, params)
+	return obj.SSObject.Call(context, name, params)
 }
 func (obj *SSArray) add(params []IObject) {
 
@@ -65,7 +52,7 @@ func (obj *SSArray) add(params []IObject) {
 func (obj *SSArray) random() IObject {
 	size := len(obj.stack)
 	if size == 0 {
-		return EmptyObject
+		return nil
 	}
 	var b [8]byte
 	_, err := crypto_rand.Read(b[:])

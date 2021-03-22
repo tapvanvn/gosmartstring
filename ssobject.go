@@ -5,7 +5,6 @@ type IFunction func(context *SSContext, input IObject, params []IObject) IObject
 
 //IObject interface for ssobject
 type IObject interface {
-	Parent() IObject
 	CanExport() bool
 	Export() []byte
 	GetType() string
@@ -16,19 +15,10 @@ type IObject interface {
 
 //Object ssobject
 type SSObject struct {
-	parent          IObject
 	extendFunctions map[string]IFunction
 }
 
-var EmptyObject = &SSObject{
-	parent:          nil,
-	extendFunctions: nil,
-}
-
 //MARK: implement IObject
-func (obj *SSObject) Parent() IObject {
-	return obj.parent
-}
 
 func (obj *SSObject) CanExport() bool {
 	return false
