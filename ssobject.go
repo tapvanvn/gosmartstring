@@ -1,7 +1,7 @@
 package gosmartstring
 
 //func(context, input, param) output
-type IFunction func(context Context, input IObject, params []IObject) IObject
+type IFunction func(context *sscontext, input IObject, params []IObject) IObject
 
 //IObject interface for ssobject
 type IObject interface {
@@ -10,7 +10,7 @@ type IObject interface {
 	Export() []byte
 	GetType() string
 	GetExtendFunc() map[string]IFunction
-	Call(context Context, name string, params []IObject) IObject
+	Call(context *sscontext, name string, params []IObject) IObject
 	Extend(functionName string, sfunc IFunction)
 }
 
@@ -52,13 +52,14 @@ func (obj *SSObject) Extend(functionName string, sfunc IFunction) {
 	obj.extendFunctions[functionName] = sfunc
 }
 
-func (obj *SSObject) Call(context Context, name string, params []IObject) IObject {
+func (obj *SSObject) Call(context *sscontext, name string, params []IObject) IObject {
 
 	if name == "json" {
 
 	}
 	if sfunc, ok := obj.extendFunctions[name]; ok {
+
 		return sfunc(context, obj, params)
 	}
-	return EmptyObject
+	return nil
 }

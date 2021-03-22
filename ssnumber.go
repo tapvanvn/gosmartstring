@@ -41,7 +41,7 @@ func (obj *SSNumber) Extend(functionName string, sfunc IFunction) {
 	obj.parent.Extend(functionName, sfunc)
 }
 
-func (obj *SSNumber) Call(context Context, name string, params []IObject) IObject {
+func (obj *SSNumber) Call(context *sscontext, name string, params []IObject) IObject {
 
 	return obj.parent.Call(context, name, params)
 }
