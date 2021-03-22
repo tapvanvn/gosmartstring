@@ -1,28 +1,28 @@
 package gosmartstring
 
-type ssruntime struct {
+type SSRuntime struct {
 	registries map[string]ssregistry
 	extend     interface{}
 }
 
-func CreateRuntime(extend interface{}) *ssruntime {
-	return &ssruntime{
+func CreateRuntime(extend interface{}) *SSRuntime {
+	return &SSRuntime{
 		registries: map[string]ssregistry{},
 		extend:     extend,
 	}
 }
 
-func (runtime *ssruntime) RegisterObject(name string, object IObject) {
+func (runtime *SSRuntime) RegisterObject(name string, object IObject) {
 
 	runtime.registries[name] = CreateObjectRegistry(object)
 }
 
-func (runtime *ssruntime) RegisterFunction(name string, sfunc IFunction) {
+func (runtime *SSRuntime) RegisterFunction(name string, sfunc IFunction) {
 
 	runtime.registries[name] = CreateFunctionRegistry(sfunc)
 }
 
-func (runtime *ssruntime) GetRegistry(name string) *ssregistry {
+func (runtime *SSRuntime) GetRegistry(name string) *ssregistry {
 
 	if registry, ok := runtime.registries[name]; ok {
 

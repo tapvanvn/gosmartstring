@@ -4,7 +4,7 @@ type sscontext struct {
 	Root    *sscontext
 	Parent  *sscontext
 	Level   int
-	Runtime *ssruntime
+	Runtime *SSRuntime
 	This    IObject
 	HotLink bool
 	//not public
@@ -12,7 +12,7 @@ type sscontext struct {
 	registries map[string]ssregistry
 }
 
-func CreateContext(runtime *ssruntime) *sscontext {
+func CreateContext(runtime *SSRuntime) *sscontext {
 
 	ctx := &sscontext{
 		Level:   0,
