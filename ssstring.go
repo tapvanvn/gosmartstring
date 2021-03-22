@@ -12,15 +12,15 @@ func CreateString(value string) SSString {
 	}
 }
 
-func (obj *SSString) CanExport() bool {
+func (obj SSString) CanExport() bool {
 	return true
 }
 
-func (obj *SSString) Export() []byte {
+func (obj SSString) Export() []byte {
 
 	return []byte(obj.Value)
 }
 
-func (obj *SSString) GetType() string {
+func (obj SSString) GetType() string {
 	return "ssstring"
 }

@@ -32,7 +32,7 @@ func (obj SSObject) GetType() string {
 	return "ssobject"
 }
 
-func (obj *SSObject) GetExtendFunc() map[string]IFunction {
+func (obj SSObject) GetExtendFunc() map[string]IFunction {
 
 	return obj.extendFunctions
 }

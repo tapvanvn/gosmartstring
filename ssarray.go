@@ -20,19 +20,19 @@ func CreateSSArray() SSArray {
 
 //MARK: implement IObject
 
-func (obj *SSArray) CanExport() bool {
+func (obj SSArray) CanExport() bool {
 	return false
 }
 
-func (obj *SSArray) Export() []byte {
+func (obj SSArray) Export() []byte {
 	return nil
 }
 
-func (obj *SSArray) GetType() string {
+func (obj SSArray) GetType() string {
 	return "ssarray"
 }
 
-func (obj *SSArray) Call(context *SSContext, name string, params []IObject) IObject {
+func (obj SSArray) Call(context *SSContext, name string, params []IObject) IObject {
 
 	if name == "add" {
 

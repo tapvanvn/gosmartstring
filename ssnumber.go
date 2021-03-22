@@ -11,17 +11,17 @@ func CreateSSNumber(value int) SSNumber {
 	}
 }
 
-func (obj *SSNumber) CanExport() bool {
+func (obj SSNumber) CanExport() bool {
 	return true
 }
 
-func (obj *SSNumber) Export() []byte {
+func (obj SSNumber) Export() []byte {
 	/*if obj.Value {
 		return []byte("true")
 	}*/
 	return []byte("false")
 }
 
-func (obj *SSNumber) GetType() string {
+func (obj SSNumber) GetType() string {
 	return "ssnumber"
 }
