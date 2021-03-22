@@ -15,11 +15,13 @@ type SSContext struct {
 func CreateContext(runtime *SSRuntime) *SSContext {
 
 	ctx := &SSContext{
-		Level:   0,
-		Parent:  nil,
-		Runtime: runtime,
-		This:    nil,
-		HotLink: false,
+		Level:      0,
+		Parent:     nil,
+		Runtime:    runtime,
+		This:       nil,
+		HotLink:    false,
+		result:     make([]byte, 0),
+		registries: map[string]ssregistry{},
 	}
 	ctx.Root = ctx
 	return ctx
@@ -29,12 +31,13 @@ func (ctx *SSContext) CreateSubContext() *SSContext {
 
 	subContext := &SSContext{
 
-		Level:   ctx.Level + 1,
-		Runtime: ctx.Runtime,
-		Root:    ctx.Root,
-		Parent:  ctx,
-		This:    ctx.This,
-		HotLink: ctx.HotLink,
+		Level:      ctx.Level + 1,
+		Runtime:    ctx.Runtime,
+		Root:       ctx.Root,
+		Parent:     ctx,
+		This:       ctx.This,
+		HotLink:    ctx.HotLink,
+		registries: map[string]ssregistry{},
 	}
 	return subContext
 }
