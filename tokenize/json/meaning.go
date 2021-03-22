@@ -10,6 +10,7 @@ type JSONMeaning struct {
 
 func CreateJSONMeaning() JSONMeaning {
 	jsonMeaning := JSONMeaning{
-		parent: gotokenize.M
+		//parent: gotokenize.M
 	}
+	return jsonMeaning
 }
