@@ -1,13 +1,13 @@
 package gosmartstring
 
 type SSJSON struct {
-	SSObject
+	IObject
 	attributes map[string]IObject
 }
 
 func CreateSSJSON(jsonString string) (SSJSON, error) {
 	json := SSJSON{
-		SSObject: SSObject{},
+		IObject: &SSObject{},
 	}
 	return json, nil
 }

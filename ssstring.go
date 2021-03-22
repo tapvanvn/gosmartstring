@@ -1,14 +1,14 @@
 package gosmartstring
 
 type SSString struct {
-	SSObject
+	IObject
 	Value string
 }
 
 func CreateString(value string) SSString {
 	return SSString{
-		SSObject: SSObject{},
-		Value:    value,
+		IObject: &SSObject{},
+		Value:   value,
 	}
 }
 

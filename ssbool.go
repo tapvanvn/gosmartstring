@@ -1,14 +1,14 @@
 package gosmartstring
 
 type SSBool struct {
-	SSObject
+	IObject
 	Value bool
 }
 
 func CreateBool(value bool) SSBool {
 	return SSBool{
-		SSObject: SSObject{},
-		Value:    value,
+		IObject: &SSObject{},
+		Value:   value,
 	}
 }
 

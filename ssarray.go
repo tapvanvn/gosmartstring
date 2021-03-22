@@ -7,14 +7,14 @@ import (
 )
 
 type SSArray struct {
-	SSObject
+	IObject
 	stack []IObject
 }
 
 func CreateSSArray() SSArray {
 	return SSArray{
-		SSObject: SSObject{},
-		stack:    []IObject{},
+		IObject: &SSObject{},
+		stack:   []IObject{},
 	}
 }
 
@@ -42,7 +42,7 @@ func (obj *SSArray) Call(context *SSContext, name string, params []IObject) IObj
 
 		return obj.random()
 	}
-	return obj.SSObject.Call(context, name, params)
+	return obj.IObject.Call(context, name, params)
 }
 func (obj *SSArray) add(params []IObject) {
 
