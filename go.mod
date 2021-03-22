@@ -3,5 +3,5 @@ module github.com/tapvanvn/gosmartstring
 go 1.15
 
 require (
-	github.com/tapvanvn/gotokenize v1.0.5-alpha.1
+	github.com/tapvanvn/gotokenize v1.0.5-alpha.2
 )
