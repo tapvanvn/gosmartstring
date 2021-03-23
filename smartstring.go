@@ -1,6 +1,6 @@
 package gosmartstring
 
-const (
+var (
 	TokenSSRegistry = 10 //link to registry
 
 	TokenSSInstructionDo     = 100 //command to do
@@ -22,4 +22,19 @@ var AllSSInstructions = []int{
 	TokenSSInstructionCase,
 	TokenSSInstructionEach,
 	TokenSSInstructionCount,
+}
+
+var SSInstructionTokenMove int = 0
+
+func SSInsructionMove(delta int) {
+
+	TokenSSInstructionDo += delta
+	TokenSSInstructionLink += delta
+	TokenSSInstructionPack += delta
+	TokenSSInstructionExport += delta
+	TokenSSInstructionIf += delta
+	TokenSSInstructionCase += delta
+	TokenSSInstructionEach += delta
+	TokenSSInstructionCount += delta
+
 }
