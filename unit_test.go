@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/tapvanvn/gosmartstring"
+	"github.com/tapvanvn/gotokenize"
 )
 
 func SSFuncTest(context *gosmartstring.SSContext, input gosmartstring.IObject, params []gosmartstring.IObject) gosmartstring.IObject {
@@ -30,11 +31,16 @@ func createRuntime() *gosmartstring.SSRuntime {
 
 func TestSSInstruction(t *testing.T) {
 	context := gosmartstring.CreateContext(createRuntime())
+	stream := gotokenize.CreateStream()
 	instructionDo := gosmartstring.BuildInstructionDo("template",
 		[]gosmartstring.IObject{
 			gosmartstring.CreateString("test:html/index.html"),
 		}, context)
 
+	stream.AddToken(instructionDo)
 	compiler := gosmartstring.SSCompiler{}
-	compiler.Compile(&instructionDo, context)
+
+	compiler.Compile(&stream, context)
+
+	context.PrintDebug()
 }

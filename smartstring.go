@@ -1,7 +1,9 @@
 package gosmartstring
 
 var (
-	TokenSSRegistry = 10 //link to registry
+	TokenSSRegistryIgnore = 10 //dont care result
+	TokenSSRegistry       = 11 //link to registry
+	TokenSSRegistryGlobal = 12 //set result registry address to global
 
 	TokenSSInstructionDo     = 100 //command to do
 	TokenSSInstructionLink   = 101 //link last instruction to be input of next instruction
