@@ -101,6 +101,8 @@ func (compiler *SSCompiler) compileDo(token *gotokenize.Token, context *SSContex
 			if param != nil && param.Object != nil {
 
 				params = append(params, param.Object)
+			} else {
+				return errors.New("registry not found " + childToken.Content)
 			}
 		}
 	}
