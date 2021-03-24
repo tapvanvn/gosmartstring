@@ -40,12 +40,12 @@ func (meaning *SmarstringInstructionMeaning) buildSmarstring(token *gotokenize.T
 		if insToken == nil {
 			break
 		}
-		meaning.buildIntruction(insToken, &packToken, context)
+		meaning.buildInstruction(insToken, &packToken, context)
 	}
 	return packToken
 }
 
-func (meaning *SmarstringInstructionMeaning) buildIntruction(token *gotokenize.Token, packToken *gotokenize.Token, context *SSContext) {
+func (meaning *SmarstringInstructionMeaning) buildInstruction(token *gotokenize.Token, packToken *gotokenize.Token, context *SSContext) {
 	iter := token.Children.Iterator()
 	for {
 		childToken := iter.Read()
