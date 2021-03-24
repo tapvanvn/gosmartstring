@@ -103,6 +103,7 @@ func (compiler *SSCompiler) compileDo(token *gotokenize.Token, context *SSContex
 				params = append(params, param.Object)
 			} else {
 				fmt.Println("registry not found " + childToken.Content)
+				context.PrintDebug()
 				return errors.New("registry not found " + childToken.Content)
 			}
 		}
