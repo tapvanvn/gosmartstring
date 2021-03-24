@@ -165,7 +165,10 @@ func (compiler *SSCompiler) compileEach(token *gotokenize.Token, context *SSCont
 			if childToken == nil {
 				break
 			}
-			compiler.CompileToken(childToken, context)
+			err := compiler.CompileToken(childToken, context)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
