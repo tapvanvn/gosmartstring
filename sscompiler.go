@@ -8,7 +8,7 @@ import (
 )
 
 type SSICompiler interface {
-	Compile(stream *gotokenize.TokenStream, ctx *SSContext)
+	Compile(stream *gotokenize.TokenStream, ctx *SSContext) error
 }
 
 type SSCompiler struct {

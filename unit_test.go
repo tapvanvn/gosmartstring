@@ -126,10 +126,10 @@ func TestSSLMeaning2(t *testing.T) {
 func TestSSLInstruction(t *testing.T) {
 	context := gosmartstring.CreateContext(createRuntime())
 	content := "{{testDo(testDo3(\"hey\"), \"hello\").test, testDo(\"bcd\").test+put(a)}}"
-	meaning := gosmartstring.CreateSSInstructionMeaning(context)
+	meaning := gosmartstring.CreateSSInstructionMeaning()
 	stream := gotokenize.CreateStream()
 	stream.Tokenize(content)
-	meaning.Prepare(&stream)
+	meaning.Prepare(&stream, context)
 	token := meaning.Next()
 	for {
 		if token == nil {

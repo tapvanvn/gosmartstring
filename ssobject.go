@@ -6,7 +6,7 @@ type IFunction func(context *SSContext, input IObject, params []IObject) IObject
 //IObject interface for ssobject
 type IObject interface {
 	CanExport() bool
-	Export() []byte
+	Export(context *SSContext) []byte
 	GetType() string
 	GetExtendFunc() map[string]IFunction
 	Call(context *SSContext, name string, params []IObject) IObject
@@ -24,7 +24,7 @@ func (obj SSObject) CanExport() bool {
 	return false
 }
 
-func (obj SSObject) Export() []byte {
+func (obj SSObject) Export(context *SSContext) []byte {
 	return nil
 }
 

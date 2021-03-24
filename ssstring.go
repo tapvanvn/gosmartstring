@@ -16,7 +16,7 @@ func (obj SSString) CanExport() bool {
 	return true
 }
 
-func (obj SSString) Export() []byte {
+func (obj SSString) Export(context *SSContext) []byte {
 
 	return []byte(obj.Value)
 }

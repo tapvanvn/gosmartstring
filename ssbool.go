@@ -16,7 +16,7 @@ func (obj SSBool) CanExport() bool {
 	return true
 }
 
-func (obj SSBool) Export() []byte {
+func (obj SSBool) Export(context *SSContext) []byte {
 	if obj.Value {
 		return []byte("true")
 	}

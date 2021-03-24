@@ -20,14 +20,6 @@ func CreateSSArray() *SSArray {
 
 //MARK: implement IObject
 
-func (obj SSArray) CanExport() bool {
-	return false
-}
-
-func (obj SSArray) Export() []byte {
-	return nil
-}
-
 func (obj SSArray) GetType() string {
 	return "ssarray"
 }
