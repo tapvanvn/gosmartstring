@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/google/uuid"
 	"github.com/tapvanvn/gotokenize"
 )
 
 type SSContext struct {
+	id      uuid.UUID
 	Root    *SSContext
 	Parent  *SSContext
 	Level   int
@@ -31,6 +33,7 @@ type ssResultInfo struct {
 func CreateContext(runtime *SSRuntime) *SSContext {
 
 	ctx := &SSContext{
+		id:            uuid.New(),
 		Level:         0,
 		Parent:        nil,
 		Runtime:       runtime,
@@ -46,7 +49,7 @@ func CreateContext(runtime *SSRuntime) *SSContext {
 func (ctx *SSContext) CreateSubContext() *SSContext {
 
 	subContext := &SSContext{
-
+		id:         uuid.New(),
 		Level:      ctx.Level + 1,
 		Runtime:    ctx.Runtime,
 		Root:       ctx.Root,
@@ -115,6 +118,7 @@ func (ctx *SSContext) PrintDebug() {
 
 		ctx.Parent.PrintDebug()
 	}
+	fmt.Println("context id:", ctx.id)
 	for name, registry := range ctx.registries {
 
 		if registry.Function != nil {
