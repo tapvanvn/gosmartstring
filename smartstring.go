@@ -1,6 +1,22 @@
 package gosmartstring
 
+import "github.com/tapvanvn/gotokenize"
+
 var (
+	//MARK: smartstring
+	TokenSSLOperator = 1
+	TokenSSLString   = 2
+
+	TokenSSLParenthese = 100
+	TokenSSLBlock      = 101
+	TokenSSLSquare     = 102
+
+	TokenSSLCommand = 1000
+
+	TokenSSLSmarstring   = 1001
+	TokenSSLNormalstring = 1002
+
+	//MARK:
 	TokenSSRegistryIgnore = 10 //dont care result
 	TokenSSRegistry       = 11 //link to registry
 	TokenSSRegistryGlobal = 12 //set result registry address to global
@@ -39,4 +55,21 @@ func SSInsructionMove(delta int) {
 	TokenSSInstructionEach += delta
 	TokenSSInstructionCount += delta
 
+}
+
+var SSLGlobalNested = []int{
+	TokenSSLSmarstring,
+}
+var SSLIgnores = []int{}
+
+var SSLPatterns = []gotokenize.Pattern{
+	//pattern attribute "key"="value"
+	{
+		Type: TokenSSLCommand,
+		Struct: []gotokenize.PatternToken{
+			{Type: 0},
+			{Type: TokenSSLParenthese, CanNested: true},
+		},
+		IsRemoveGlobalIgnore: true,
+	},
 }
