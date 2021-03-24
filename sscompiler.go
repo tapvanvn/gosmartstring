@@ -72,7 +72,6 @@ func (compiler *SSCompiler) compilePack(token *gotokenize.Token, context *SSCont
 	if err != nil {
 		return err
 	}
-	//Todo: gather result
 	return nil
 }
 

@@ -83,3 +83,62 @@ func TestSSInstructionEach(t *testing.T) {
 
 	//context.PrintDebug()
 }
+
+func TestSSLMeaning(t *testing.T) {
+
+	content := "{{testDo(\"abc\").test, testDo(\"bcd\").test+put(a)}}"
+	meaning := gosmartstring.CreateSSMeaning()
+	stream := gotokenize.CreateStream()
+	stream.Tokenize(content)
+	meaning.Prepare(&stream)
+	token := meaning.Next()
+	for {
+		if token == nil {
+			break
+		}
+		fmt.Println(token.Type, token.Content)
+		if token.Type == gosmartstring.TokenSSLSmarstring {
+			token.Children.Debug(0, nil)
+		}
+		token = meaning.Next()
+	}
+}
+func TestSSLMeaning2(t *testing.T) {
+
+	content := "{{testDo(testDo3(\"hey\"), \"hello\").test, testDo(\"bcd\").test+put(a)}}"
+	meaning := gosmartstring.CreateSSMeaning()
+	stream := gotokenize.CreateStream()
+	stream.Tokenize(content)
+	meaning.Prepare(&stream)
+	token := meaning.Next()
+	for {
+		if token == nil {
+			break
+		}
+		fmt.Println(token.Type, token.Content)
+		if token.Type == gosmartstring.TokenSSLSmarstring {
+			token.Children.Debug(0, nil)
+		}
+		token = meaning.Next()
+	}
+}
+
+func TestSSLInstruction(t *testing.T) {
+	context := gosmartstring.CreateContext(createRuntime())
+	content := "{{testDo(testDo3(\"hey\"), \"hello\").test, testDo(\"bcd\").test+put(a)}}"
+	meaning := gosmartstring.CreateSSInstructionMeaning(context)
+	stream := gotokenize.CreateStream()
+	stream.Tokenize(content)
+	meaning.Prepare(&stream)
+	token := meaning.Next()
+	for {
+		if token == nil {
+			break
+		}
+		fmt.Println(token.Type, token.Content)
+
+		token.Children.Debug(0, nil)
+
+		token = meaning.Next()
+	}
+}

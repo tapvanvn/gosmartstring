@@ -1,6 +1,10 @@
 package gosmartstring
 
-import "github.com/tapvanvn/gotokenize"
+import (
+	"fmt"
+
+	"github.com/tapvanvn/gotokenize"
+)
 
 const ()
 
@@ -9,7 +13,7 @@ type SmarstringRawMeaning struct {
 	IsSmartstringOnly bool
 }
 
-func CreateSmarstringRawMeaning() SmarstringRawMeaning {
+func CreateSSRawMeaning() SmarstringRawMeaning {
 
 	tokenMap := map[string]gotokenize.RawTokenDefine{
 		".(){}[]+-*/\\,\"'": {TokenType: TokenSSLOperator, Separate: true},
@@ -25,21 +29,23 @@ func CreateSmarstringRawMeaning() SmarstringRawMeaning {
 func (meaning *SmarstringRawMeaning) Prepare(stream *gotokenize.TokenStream) {
 
 	meaning.RawMeaning.Prepare(stream)
-
 	tmpStream := gotokenize.CreateStream()
 	meaning.IsSmartstringOnly = true
+
 	iter := meaning.GetIter()
 	for {
 		if iter.EOS() {
 			break
 		}
-		token := iter.Read()
+		token := iter.Get()
 
 		var reach = false
 
 		if token.Content == "{" {
 			token2 := iter.GetBy(1)
+
 			if token2 != nil && token2.Content == "{" {
+				fmt.Println("found smartstring")
 				iter.Read()
 				iter.Read()
 				newToken := meaning.meaningSmartString(meaning.continueSmartString(iter))
@@ -69,7 +75,7 @@ func (meaning *SmarstringRawMeaning) Prepare(stream *gotokenize.TokenStream) {
 			tmpStream.AddToken(*token)
 		}
 	}
-
+	meaning.SetStream(tmpStream)
 }
 
 func (meaning *SmarstringRawMeaning) continueSmartString(iter *gotokenize.Iterator) gotokenize.Token {

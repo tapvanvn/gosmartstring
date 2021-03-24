@@ -1,13 +1,15 @@
 package gosmartstring
 
-import "github.com/tapvanvn/gotokenize"
+import (
+	"github.com/tapvanvn/gotokenize"
+)
 
 type SmarstringMeaning struct {
 	gotokenize.PatternMeaning
 }
 
-func CreateSmarstringMeaning() SmarstringMeaning {
-	meaning := CreateSmarstringRawMeaning()
+func CreateSSMeaning() SmarstringMeaning {
+	meaning := CreateSSRawMeaning()
 	return SmarstringMeaning{
 		PatternMeaning: gotokenize.CreatePatternMeaning(&meaning, SSLPatterns, SSLIgnores, SSLGlobalNested),
 	}
@@ -37,13 +39,20 @@ func (meaning *SmarstringMeaning) Prepare(stream *gotokenize.TokenStream) {
 
 			tmpStream.AddToken(*token)
 		}
+
 		token = meaning.PatternMeaning.Next()
 	}
 
 	meaning.SetStream(tmpStream)
+	//tmpStream.Debug(0, nil)
 }
 
 func (meaning *SmarstringMeaning) parseInstruction(token *gotokenize.Token) gotokenize.Token {
+
+	if token.Type != TokenSSLSmarstring && token.Type != TokenSSLParenthese {
+
+		return *token
+	}
 
 	newToken := gotokenize.Token{
 		Type: token.Type,
@@ -64,7 +73,6 @@ func (meaning *SmarstringMeaning) parseInstruction(token *gotokenize.Token) goto
 	}
 
 	return newToken
-
 }
 
 func (meaning *SmarstringMeaning) getNextInstruction(iter *gotokenize.Iterator) *gotokenize.Token {
@@ -78,7 +86,8 @@ func (meaning *SmarstringMeaning) getNextInstruction(iter *gotokenize.Iterator) 
 		if token.Type == 0 || token.Type == TokenSSLCommand {
 
 			instructionToken := &gotokenize.Token{
-				Type: TokenSSInstructionDo,
+
+				Type: TokenSSLInstruction,
 			}
 
 			if token.Type == TokenSSLCommand {
@@ -123,11 +132,9 @@ func (meaning *SmarstringMeaning) reachUntilEndInstruction(iter *gotokenize.Iter
 
 		} else if token.Type == 0 || token.Type == TokenSSLCommand {
 
-			//debugPrint("try to reach nested intructions 2")
 			currentToken.Children.AddToken(meaning.parseInstruction(token))
 		}
 		_ = iter.Read()
 
 	}
-
 }

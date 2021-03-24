@@ -7,28 +7,28 @@ var (
 	TokenSSLOperator = 1
 	TokenSSLString   = 2
 
-	TokenSSLParenthese = 100
-	TokenSSLBlock      = 101
-	TokenSSLSquare     = 102
+	TokenSSLParenthese = 10
+	TokenSSLBlock      = 11
+	TokenSSLSquare     = 12
 
-	TokenSSLCommand = 1000
-
-	TokenSSLSmarstring   = 1001
-	TokenSSLNormalstring = 1002
+	TokenSSLCommand      = 100
+	TokenSSLInstruction  = 101
+	TokenSSLSmarstring   = 102
+	TokenSSLNormalstring = 103
 
 	//MARK:
-	TokenSSRegistryIgnore = 10 //dont care result
-	TokenSSRegistry       = 11 //link to registry
-	TokenSSRegistryGlobal = 12 //set result registry address to global
+	TokenSSRegistryIgnore = 200 //dont care result
+	TokenSSRegistry       = 201 //link to registry
+	TokenSSRegistryGlobal = 202 //set result registry address to global
 
-	TokenSSInstructionDo     = 100 //command to do
-	TokenSSInstructionLink   = 101 //link last instruction to be input of next instruction
-	TokenSSInstructionPack   = 102 //each children is an instruction
-	TokenSSInstructionExport = 103 //just export string
-	TokenSSInstructionIf     = 104 //if statement
-	TokenSSInstructionCase   = 105 //check in cases
-	TokenSSInstructionEach   = 106 //loop for each .. in .. and do
-	TokenSSInstructionCount  = 107 //count to and do
+	TokenSSInstructionDo     = 300 //command to do
+	TokenSSInstructionLink   = 301 //link last instruction to be input of next instruction
+	TokenSSInstructionPack   = 302 //each children is an instruction
+	TokenSSInstructionExport = 303 //just export string
+	TokenSSInstructionIf     = 304 //if statement
+	TokenSSInstructionCase   = 305 //check in cases
+	TokenSSInstructionEach   = 306 //loop for each .. in .. and do
+	TokenSSInstructionCount  = 307 //count to and do
 )
 
 var AllSSInstructions = []int{
@@ -45,6 +45,24 @@ var AllSSInstructions = []int{
 var SSInstructionTokenMove int = 0
 
 func SSInsructionMove(delta int) {
+
+	//MARK: smartstring
+	TokenSSLOperator += delta
+	TokenSSLString += delta
+
+	TokenSSLParenthese += delta
+	TokenSSLBlock += delta
+	TokenSSLSquare += delta
+
+	TokenSSLCommand += delta
+	TokenSSLInstruction += delta
+	TokenSSLSmarstring += delta
+	TokenSSLNormalstring += delta
+
+	//MARK:
+	TokenSSRegistryIgnore += delta
+	TokenSSRegistry += delta
+	TokenSSRegistryGlobal += delta
 
 	TokenSSInstructionDo += delta
 	TokenSSInstructionLink += delta
