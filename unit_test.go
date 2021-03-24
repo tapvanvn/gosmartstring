@@ -8,12 +8,12 @@ import (
 	"github.com/tapvanvn/gotokenize"
 )
 
-func SSFuncTest(context *gosmartstring.SSContext, input gosmartstring.IObject, params []gosmartstring.IObject) gosmartstring.IObject {
+func SSFuncTestDo(context *gosmartstring.SSContext, input gosmartstring.IObject, params []gosmartstring.IObject) gosmartstring.IObject {
 
-	fmt.Println("call SSFuncTest", len(params))
+	fmt.Println("call SSFuncTestDo", len(params))
 	if len(params) == 1 {
 
-		if sstring, ok := params[0].(gosmartstring.SSString); ok {
+		if sstring, ok := params[0].(*gosmartstring.SSString); ok {
 
 			id := sstring.Value
 
@@ -22,17 +22,33 @@ func SSFuncTest(context *gosmartstring.SSContext, input gosmartstring.IObject, p
 	}
 	return nil
 }
+func SSFuncTestEach(context *gosmartstring.SSContext, input gosmartstring.IObject, params []gosmartstring.IObject) gosmartstring.IObject {
+	fmt.Println("call SSFuncTestDo", len(params))
+	if element := context.GetRegistry("element"); element != nil && element.Object != nil {
+		if sstring, ok := element.Object.(*gosmartstring.SSString); ok {
+			fmt.Println("element", sstring.Value)
+			return element.Object
+		} else {
+			fmt.Println("element is not a string")
+		}
+	} else {
+		//TODO report error
+		fmt.Println("element not found")
+	}
+	return nil
+}
 
 func createRuntime() *gosmartstring.SSRuntime {
 	runtime := gosmartstring.CreateRuntime(nil)
-	runtime.RegisterFunction("template", SSFuncTest)
+	runtime.RegisterFunction("testDo", SSFuncTestDo)
+	runtime.RegisterFunction("testEach", SSFuncTestEach)
 	return runtime
 }
 
-func TestSSInstruction(t *testing.T) {
+func TestSSInstructionDo(t *testing.T) {
 	context := gosmartstring.CreateContext(createRuntime())
 	stream := gotokenize.CreateStream()
-	instructionDo := gosmartstring.BuildInstructionDo("template",
+	instructionDo := gosmartstring.BuildDo("testDo",
 		[]gosmartstring.IObject{
 			gosmartstring.CreateString("test:html/index.html"),
 		}, context)
@@ -43,4 +59,27 @@ func TestSSInstruction(t *testing.T) {
 	compiler.Compile(&stream, context)
 
 	context.PrintDebug()
+}
+
+func TestSSInstructionEach(t *testing.T) {
+	context := gosmartstring.CreateContext(createRuntime())
+	stream := gotokenize.CreateStream()
+
+	ssArray := gosmartstring.CreateSSArray()
+	ssArray.Stack = append(ssArray.Stack, gosmartstring.CreateString("e1"))
+	ssArray.Stack = append(ssArray.Stack, gosmartstring.CreateString("e2"))
+
+	context.RegisterObject("testArray", ssArray)
+
+	instructionDo := gosmartstring.BuildDo("testEach", []gosmartstring.IObject{}, context)
+
+	instructionEach := gosmartstring.BuildEach("testArray", "element", []gotokenize.Token{instructionDo}, context)
+
+	stream.AddToken(instructionEach)
+
+	compiler := gosmartstring.SSCompiler{}
+
+	compiler.Compile(&stream, context)
+
+	//context.PrintDebug()
 }

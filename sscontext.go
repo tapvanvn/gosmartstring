@@ -14,10 +14,12 @@ type SSContext struct {
 	Runtime *SSRuntime
 	This    IObject
 	HotLink bool
+
 	//not public
-	result        []ssResultInfo
+	result        []IObject
 	registries    map[string]ssregistry
 	registryCount int
+	registryStack *SSAddressStack
 }
 
 type ssResultInfo struct {
@@ -34,7 +36,6 @@ func CreateContext(runtime *SSRuntime) *SSContext {
 		Runtime:       runtime,
 		This:          nil,
 		HotLink:       false,
-		result:        make([]ssResultInfo, 0),
 		registries:    map[string]ssregistry{},
 		registryCount: 0,
 	}
@@ -87,16 +88,31 @@ func (ctx *SSContext) GetRegistry(name string) *ssregistry {
 	return ctx.Runtime.GetRegistry(name)
 }
 
-func (ctx *SSContext) StackResult(stream *gotokenize.TokenStream, beginOffset int, endOffset int) {
-	ctx.Root.result = append(ctx.Root.result, ssResultInfo{
-		stream:      stream,
-		beginOffset: beginOffset,
-		endOffset:   endOffset,
-	})
+func (ctx *SSContext) StackResult(addressType int, address string, result IObject) {
+
+	if addressType == TokenSSRegistryGlobal {
+
+		ctx.Root.RegisterObject(address, result)
+
+		if ctx.registryStack != nil {
+
+			ctx.registryStack.Append(address)
+		}
+	} else if addressType == TokenSSRegistry {
+
+		ctx.RegisterObject(address, result)
+	}
+}
+
+func (ctx *SSContext) SetStackRegistry(stack *SSAddressStack) {
+
+	ctx.registryStack = stack
 }
 
 func (ctx *SSContext) PrintDebug() {
+
 	if ctx.Parent != nil {
+
 		ctx.Parent.PrintDebug()
 	}
 	for name, registry := range ctx.registries {

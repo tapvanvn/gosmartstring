@@ -8,13 +8,13 @@ import (
 
 type SSArray struct {
 	IObject
-	stack []IObject
+	Stack []IObject
 }
 
-func CreateSSArray() SSArray {
-	return SSArray{
+func CreateSSArray() *SSArray {
+	return &SSArray{
 		IObject: &SSObject{},
-		stack:   []IObject{},
+		Stack:   []IObject{},
 	}
 }
 
@@ -46,11 +46,11 @@ func (obj SSArray) Call(context *SSContext, name string, params []IObject) IObje
 }
 func (obj *SSArray) add(params []IObject) {
 
-	obj.stack = append(obj.stack, params...)
+	obj.Stack = append(obj.Stack, params...)
 }
 
 func (obj *SSArray) random() IObject {
-	size := len(obj.stack)
+	size := len(obj.Stack)
 	if size == 0 {
 		return nil
 	}
@@ -61,5 +61,5 @@ func (obj *SSArray) random() IObject {
 	}
 	rand.Seed(int64(binary.LittleEndian.Uint64(b[:])))
 	offset := rand.Intn(size)
-	return obj.stack[offset]
+	return obj.Stack[offset]
 }

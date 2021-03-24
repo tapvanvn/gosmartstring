@@ -5,7 +5,7 @@ import (
 	"github.com/tapvanvn/gotokenize"
 )
 
-func BuildInstructionDo(name string, params []IObject, context *SSContext) gotokenize.Token {
+func BuildDo(name string, params []IObject, context *SSContext) gotokenize.Token {
 
 	token := gotokenize.Token{
 		Type:    TokenSSInstructionDo,
@@ -16,7 +16,6 @@ func BuildInstructionDo(name string, params []IObject, context *SSContext) gotok
 	}
 	if context == context.Root {
 		addressToken.Type = TokenSSRegistryGlobal
-
 	}
 	addressToken.Content = context.IssueAddress()
 
@@ -33,6 +32,32 @@ func BuildInstructionDo(name string, params []IObject, context *SSContext) gotok
 			Type:    TokenSSRegistry,
 			Content: registerName,
 		})
+	}
+	return token
+}
+
+func BuildEach(arrayName string, varName string, actionsTokens []gotokenize.Token, context *SSContext) gotokenize.Token {
+	token := gotokenize.Token{
+		Type:    TokenSSInstructionEach,
+		Content: arrayName,
+	}
+	addressToken := gotokenize.Token{
+		Type: TokenSSRegistry,
+	}
+	if context == context.Root {
+		addressToken.Type = TokenSSRegistryGlobal
+	}
+	addressToken.Content = context.IssueAddress()
+
+	token.Children.AddToken(addressToken)
+	//var address
+	token.Children.AddToken(gotokenize.Token{
+		Type:    TokenSSRegistry,
+		Content: varName,
+	})
+	//instruction
+	for _, insToken := range actionsTokens {
+		token.Children.AddToken(insToken)
 	}
 	return token
 }

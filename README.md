@@ -5,8 +5,7 @@
 - instruction pack : 
     - [...] : instructions in pack
 
-- instruction each : 
+- instruction each : array_address
     - result_address : address_token
-    - array_address : string 
     - var element: string
-    - [instructions] : instructions do with each element
+    - [...] : instructions do with each element

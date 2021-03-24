@@ -5,8 +5,8 @@ type SSString struct {
 	Value string
 }
 
-func CreateString(value string) SSString {
-	return SSString{
+func CreateString(value string) *SSString {
+	return &SSString{
 		IObject: &SSObject{},
 		Value:   value,
 	}
