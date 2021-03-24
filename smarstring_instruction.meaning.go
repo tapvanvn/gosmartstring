@@ -4,17 +4,15 @@ import "github.com/tapvanvn/gotokenize"
 
 type SmarstringInstructionMeaning struct {
 	SmarstringMeaning
-	Context *SSContext
 }
 
-func CreateSSInstructionMeaning(context *SSContext) SmarstringInstructionMeaning {
+func CreateSSInstructionMeaning() SmarstringInstructionMeaning {
 	return SmarstringInstructionMeaning{
 		SmarstringMeaning: CreateSSMeaning(),
-		Context:           context,
 	}
 }
 
-func (meaning *SmarstringInstructionMeaning) Prepare(stream *gotokenize.TokenStream) {
+func (meaning *SmarstringInstructionMeaning) Prepare(stream *gotokenize.TokenStream, context *SSContext) {
 
 	meaning.SmarstringMeaning.Prepare(stream)
 	tmpStream := gotokenize.CreateStream()
@@ -24,7 +22,7 @@ func (meaning *SmarstringInstructionMeaning) Prepare(stream *gotokenize.TokenStr
 			break
 		}
 		if token.Type == TokenSSLSmarstring {
-			tmpStream.AddToken(meaning.buildSmarstring(token, meaning.Context))
+			tmpStream.AddToken(meaning.buildSmarstring(token, context))
 		} else {
 			tmpStream.AddToken(*token)
 		}
