@@ -77,27 +77,6 @@ func (ctx *SSContext) RegisterObject(name string, object IObject) {
 		ctx.registryStack.Append(name, finalAddress)
 	}
 
-	if object != nil {
-		content := ""
-		if sstring, ok := object.(*SSString); ok {
-			content = sstring.Value
-			if len(content) > 30 {
-				content = content[:30]
-			}
-		}
-		if ctx.registryStack != nil {
-			fmt.Println(ctx.ID(), "stack result:", name, "->", finalAddress, object.GetType(), content)
-		} else {
-			fmt.Println(ctx.ID(), "stack result:", finalAddress, object.GetType(), content)
-		}
-	} else {
-		if ctx.registryStack != nil {
-			fmt.Println(ctx.ID(), "stack result nil:", name, "->", finalAddress)
-		} else {
-			fmt.Println(ctx.ID(), "stack result nil:", finalAddress, object.GetType())
-		}
-	}
-
 	ctx.registries[finalAddress] = CreateObjectRegistry(object)
 }
 
@@ -137,11 +116,7 @@ func (ctx *SSContext) GetRegistry(name string) *ssregistry {
 	}
 
 	if registry, ok := ctx.registries[address]; ok {
-		if ctx.registryStack != nil {
-			fmt.Println(ctx.id, "ctxhit", name, "->", address)
-		} else {
-			fmt.Println(ctx.id, "ctxhit", name)
-		}
+
 		return &registry
 
 	} else if ctx.Parent != nil {
