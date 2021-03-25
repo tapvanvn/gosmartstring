@@ -150,7 +150,6 @@ func (compiler *SSCompiler) compileEach(token *gotokenize.Token, context *SSCont
 	}
 	addressStack := CreateAddressStack()
 	context.SetStackRegistry(&addressStack)
-	defer context.SetStackRegistry(nil)
 
 	offset := iter.Offset
 
@@ -172,7 +171,7 @@ func (compiler *SSCompiler) compileEach(token *gotokenize.Token, context *SSCont
 		}
 		addressStack.Inc()
 	}
-
+	context.SetStackRegistry(nil)
 	context.StackResult(output.Type, output.Content, &addressStack)
 	return nil
 }

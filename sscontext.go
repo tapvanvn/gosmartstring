@@ -44,6 +44,7 @@ func CreateContext(runtime *SSRuntime) *SSContext {
 		HotLink:       false,
 		registries:    map[string]ssregistry{},
 		registryCount: 0,
+		registryStack: nil,
 	}
 	ctx.Root = ctx
 	return ctx
@@ -96,13 +97,11 @@ func (ctx *SSContext) RegisterObject(name string, object IObject) {
 	}
 
 	ctx.registries[finalAddress] = CreateObjectRegistry(object)
-	ctx.registryCount++
 }
 
 func (ctx *SSContext) RegisterFunction(name string, sfunc IFunction) {
 
 	ctx.registries[name] = CreateFunctionRegistry(sfunc)
-	ctx.registryCount++
 }
 
 func (ctx *SSContext) IssueAddress() string {
