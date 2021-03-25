@@ -66,9 +66,9 @@ func (compiler *SSCompiler) compileLink(token *gotokenize.Token, context *SSCont
 
 func (compiler *SSCompiler) compilePack(token *gotokenize.Token, context *SSContext) error {
 
-	subContext := context.CreateSubContext()
+	//subContext := context.CreateSubContext()
 
-	err := compiler.Compile(&token.Children, subContext)
+	err := compiler.Compile(&token.Children, context)
 	if err != nil {
 		return err
 	}
