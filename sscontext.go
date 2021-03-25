@@ -68,7 +68,13 @@ func (ctx *SSContext) CreateSubContext() *SSContext {
 
 func (ctx *SSContext) RegisterObject(name string, object IObject) {
 
-	ctx.registries[name] = CreateObjectRegistry(object)
+	finalAddress := name
+	if ctx.registryStack != nil {
+		finalAddress := ctx.IssueAddress()
+		ctx.registryStack.Append(name, finalAddress)
+	}
+
+	ctx.registries[finalAddress] = CreateObjectRegistry(object)
 	ctx.registryCount++
 }
 

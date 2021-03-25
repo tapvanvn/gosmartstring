@@ -152,14 +152,14 @@ func (compiler *SSCompiler) compileEach(token *gotokenize.Token, context *SSCont
 	context.SetStackRegistry(&addressStack)
 	defer context.SetStackRegistry(nil)
 
-	fmt.Println("array elements num:", len(array.Stack))
 	offset := iter.Offset
 
 	for _, element := range array.Stack {
 
 		context.RegisterObject(elementName, element)
-		fmt.Println("ins-each set ", elementName, element.GetType())
+
 		iter.Seek(offset)
+
 		for {
 			childToken := iter.Read()
 			if childToken == nil {
