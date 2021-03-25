@@ -133,8 +133,6 @@ func (compiler *SSCompiler) compileEach(token *gotokenize.Token, context *SSCont
 	output := iter.Read()
 	elementNameToken := iter.Read()
 
-	addressStack := CreateAddressStack()
-
 	if len(arrayName) == 0 || output == nil || elementNameToken == nil || elementNameToken.Content == "" {
 
 		return errors.New("instruction each syntax error")
@@ -150,7 +148,7 @@ func (compiler *SSCompiler) compileEach(token *gotokenize.Token, context *SSCont
 		fmt.Println("instruction each error " + arrayName + " is not an array")
 		return errors.New("instruction each error " + arrayName + " is not an array")
 	}
-
+	addressStack := CreateAddressStack()
 	context.SetStackRegistry(&addressStack)
 	defer context.SetStackRegistry(nil)
 

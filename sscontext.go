@@ -117,7 +117,11 @@ func (ctx *SSContext) StackResult(addressType int, address string, result IObjec
 				content = content[:30]
 			}
 		}
-		fmt.Println(ctx.ID(), "stack result:", address, finalAddress, result.GetType(), content)
+		if ctx.registryStack != nil {
+			fmt.Println(ctx.ID(), "stack result:", address, "->", finalAddress, result.GetType(), content)
+		} else {
+			fmt.Println(ctx.ID(), "stack result:", finalAddress, result.GetType(), content)
+		}
 	}
 	if addressType == TokenSSRegistryGlobal {
 
