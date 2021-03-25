@@ -49,6 +49,7 @@ func CreateContext(runtime *SSRuntime) *SSContext {
 	return ctx
 }
 
+/*
 func (ctx *SSContext) CreateSubContext() *SSContext {
 
 	subContext := &SSContext{
@@ -63,6 +64,7 @@ func (ctx *SSContext) CreateSubContext() *SSContext {
 	}
 	return subContext
 }
+*/
 
 func (ctx *SSContext) RegisterObject(name string, object IObject) {
 
@@ -121,6 +123,12 @@ func (ctx *SSContext) StackResult(addressType int, address string, result IObjec
 			fmt.Println(ctx.ID(), "stack result:", address, "->", finalAddress, result.GetType(), content)
 		} else {
 			fmt.Println(ctx.ID(), "stack result:", finalAddress, result.GetType(), content)
+		}
+	} else {
+		if ctx.registryStack != nil {
+			fmt.Println(ctx.ID(), "stack result nil:", address, "->", finalAddress)
+		} else {
+			fmt.Println(ctx.ID(), "stack result nil:", finalAddress, result.GetType())
 		}
 	}
 	if addressType == TokenSSRegistryGlobal {
