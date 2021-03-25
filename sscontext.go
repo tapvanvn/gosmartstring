@@ -110,8 +110,14 @@ func (ctx *SSContext) StackResult(addressType int, address string, result IObjec
 	}
 
 	if result != nil {
-
-		fmt.Println(ctx.ID(), "stack result:", finalAddress, result.GetType())
+		content := ""
+		if sstring, ok := result.(*SSString); ok {
+			content = sstring.Value
+			if len(content) > 30 {
+				content = content[:30]
+			}
+		}
+		fmt.Println(ctx.ID(), "stack result:", address, finalAddress, result.GetType(), content)
 	}
 	if addressType == TokenSSRegistryGlobal {
 

@@ -152,6 +152,7 @@ func (compiler *SSCompiler) compileEach(token *gotokenize.Token, context *SSCont
 	}
 
 	context.SetStackRegistry(&addressStack)
+	defer context.SetStackRegistry(nil)
 
 	fmt.Println("array elements num:", len(array.Stack))
 	offset := iter.Offset
@@ -174,7 +175,6 @@ func (compiler *SSCompiler) compileEach(token *gotokenize.Token, context *SSCont
 		addressStack.Inc()
 	}
 
-	context.SetStackRegistry(nil)
 	context.StackResult(output.Type, output.Content, &addressStack)
 	return nil
 }
