@@ -101,7 +101,13 @@ func (ctx *SSContext) RegisterObject(name string, object IObject) {
 
 func (ctx *SSContext) RegisterFunction(name string, sfunc IFunction) {
 
-	ctx.registries[name] = CreateFunctionRegistry(sfunc)
+	finalAddress := name
+	if ctx.registryStack != nil {
+		finalAddress = ctx.IssueAddress()
+		ctx.registryStack.Append(name, finalAddress)
+	}
+
+	ctx.registries[finalAddress] = CreateFunctionRegistry(sfunc)
 }
 
 func (ctx *SSContext) IssueAddress() string {
