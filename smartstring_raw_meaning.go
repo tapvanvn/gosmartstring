@@ -1,8 +1,6 @@
 package gosmartstring
 
 import (
-	"fmt"
-
 	"github.com/tapvanvn/gotokenize"
 )
 
@@ -44,7 +42,7 @@ func (meaning *SmarstringRawMeaning) Prepare(stream *gotokenize.TokenStream) {
 			token2 := iter.GetBy(1)
 
 			if token2 != nil && token2.Content == "{" {
-				fmt.Println("found smartstring")
+
 				iter.Read()
 				iter.Read()
 				newToken := meaning.meaningSmartString(meaning.continueSmartString(iter))
