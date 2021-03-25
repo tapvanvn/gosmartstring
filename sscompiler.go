@@ -159,6 +159,7 @@ func (compiler *SSCompiler) compileEach(token *gotokenize.Token, context *SSCont
 	for _, element := range array.Stack {
 
 		context.RegisterObject(elementName, element)
+		fmt.Println("ins-each set ", elementName, element.GetType())
 		iter.Seek(offset)
 		for {
 			childToken := iter.Read()
