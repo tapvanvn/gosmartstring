@@ -184,6 +184,7 @@ func (compiler *SSCompiler) compileCount(token *gotokenize.Token, context *SSCon
 
 func (compiler *SSCompiler) callRegistry(name string, params []IObject, context *SSContext) {
 
+	fmt.Println("registry call:", gotokenize.ColorName(name), len(params))
 	var rs IObject = nil
 
 	if context.This != nil {
@@ -202,6 +203,10 @@ func (compiler *SSCompiler) callRegistry(name string, params []IObject, context 
 	} else if registry.Object != nil && len(params) == 0 {
 
 		rs = registry.Object
+
+	} else {
+
+		fmt.Println("registry call fail")
 	}
 
 	context.This = rs
