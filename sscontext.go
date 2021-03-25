@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/google/uuid"
 	"github.com/tapvanvn/gotokenize"
+	"go.mongodb.org/mongo-driver/x/mongo/driver/uuid"
 )
 
 var _context_id = 0
@@ -73,7 +75,7 @@ func (ctx *SSContext) RegisterObject(name string, object IObject) {
 
 	finalAddress := name
 	if ctx.registryStack != nil {
-		finalAddress = ctx.IssueAddress()
+		finalAddress = uuid.NewString()
 		ctx.registryStack.Append(name, finalAddress)
 	}
 
@@ -116,7 +118,7 @@ func (ctx *SSContext) RegisterFunction(name string, sfunc IFunction) {
 
 	finalAddress := name
 	if ctx.registryStack != nil {
-		finalAddress = ctx.IssueAddress()
+		finalAddress = uuid.NewString()
 		ctx.registryStack.Append(name, finalAddress)
 	}
 
