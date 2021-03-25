@@ -23,7 +23,6 @@ func CreateSSRawMeaning() SmarstringRawMeaning {
 		RawMeaning:        meaning,
 		IsSmartstringOnly: false,
 	}
-
 }
 
 func (meaning *SmarstringRawMeaning) Prepare(stream *gotokenize.TokenStream) {

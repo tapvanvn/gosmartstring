@@ -100,13 +100,13 @@ func (ctx *SSContext) StackResult(addressType int, address string, result IObjec
 
 		ctx.Root.RegisterObject(address, result)
 
-		if ctx.registryStack != nil {
-
-			ctx.registryStack.Append(address)
-		}
 	} else if addressType == TokenSSRegistry {
 
 		ctx.RegisterObject(address, result)
+	}
+	if ctx.registryStack != nil {
+
+		ctx.registryStack.Append(address)
 	}
 }
 
