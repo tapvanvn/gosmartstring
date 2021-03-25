@@ -96,6 +96,10 @@ func (ctx *SSContext) GetRegistry(name string) *ssregistry {
 
 func (ctx *SSContext) StackResult(addressType int, address string, result IObject) {
 
+	if result != nil {
+
+		fmt.Println(ctx.ID(), "stack result:", address, result.GetType())
+	}
 	if addressType == TokenSSRegistryGlobal {
 
 		ctx.Root.RegisterObject(address, result)

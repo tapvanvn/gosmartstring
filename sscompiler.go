@@ -204,6 +204,8 @@ func (compiler *SSCompiler) callRegistry(name string, params []IObject, context 
 
 		rs = registry.Object
 
+		fmt.Println("rs", rs.GetType())
+
 	} else {
 
 		fmt.Println("registry call fail")
