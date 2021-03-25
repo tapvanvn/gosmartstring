@@ -2,7 +2,6 @@ package gosmartstring
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/google/uuid"
 	"github.com/tapvanvn/gotokenize"
@@ -78,7 +77,7 @@ func (ctx *SSContext) RegisterFunction(name string, sfunc IFunction) {
 
 func (ctx *SSContext) IssueAddress() string {
 	ctx.registryCount++
-	return strconv.Itoa(ctx.registryCount)
+	return uuid.NewString()
 }
 
 func (ctx *SSContext) GetRegistry(name string) *ssregistry {
