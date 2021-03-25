@@ -70,7 +70,7 @@ func (ctx *SSContext) RegisterObject(name string, object IObject) {
 
 	finalAddress := name
 	if ctx.registryStack != nil {
-		finalAddress := ctx.IssueAddress()
+		finalAddress = ctx.IssueAddress()
 		ctx.registryStack.Append(name, finalAddress)
 	}
 
