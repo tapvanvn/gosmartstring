@@ -137,7 +137,11 @@ func (ctx *SSContext) GetRegistry(name string) *ssregistry {
 	}
 
 	if registry, ok := ctx.registries[address]; ok {
-
+		if ctx.registryStack != nil {
+			fmt.Println(ctx.id, "ctxhit", name, "->", address)
+		} else {
+			fmt.Println(ctx.id, "ctxhit", name)
+		}
 		return &registry
 
 	} else if ctx.Parent != nil {
