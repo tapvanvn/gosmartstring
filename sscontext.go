@@ -188,11 +188,11 @@ func (ctx *SSContext) PrintDebug(level int) {
 	for i := 0; i <= level; i++ {
 		fmt.Print("|")
 		if i == 0 {
-			fmt.Printf("%s ", gotokenize.ColorName("ctx"))
+			fmt.Printf("%s ", gotokenize.ColorContent("ctx"))
 		}
 		fmt.Print(" ")
 	}
-	fmt.Println(ctx.id)
+	fmt.Println(gotokenize.ColorName(fmt.Sprint(ctx.id)))
 
 	for name, registry := range ctx.registries {
 
