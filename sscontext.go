@@ -176,9 +176,11 @@ func (ctx *SSContext) BindingTo(context *SSContext) {
 		if context != nil {
 			ctx.Root = context.Root
 			ctx.Parent = context
+			ctx.registryStack = context.registryStack
 		} else {
 			ctx.Root = nil
 			ctx.Parent = nil
+			ctx.registryStack = nil
 		}
 	}
 }
