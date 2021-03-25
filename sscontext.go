@@ -2,6 +2,7 @@ package gosmartstring
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/google/uuid"
 	"github.com/tapvanvn/gotokenize"
@@ -77,40 +78,50 @@ func (ctx *SSContext) RegisterFunction(name string, sfunc IFunction) {
 
 func (ctx *SSContext) IssueAddress() string {
 	ctx.registryCount++
-	return uuid.NewString()
+	return strconv.Itoa(ctx.registryCount)
 }
 
 func (ctx *SSContext) GetRegistry(name string) *ssregistry {
+	var address = name
+	if ctx.registryStack != nil {
+		if translate, ok := ctx.registryStack.Get(name); ok {
+			address = translate
+		}
+	}
 
-	if registry, ok := ctx.registries[name]; ok {
+	if registry, ok := ctx.registries[address]; ok {
 
 		return &registry
 
 	} else if ctx.Parent != nil {
 
-		return ctx.Parent.GetRegistry(name)
+		return ctx.Parent.GetRegistry(address)
 	}
-	return ctx.Runtime.GetRegistry(name)
+
+	return ctx.Runtime.GetRegistry(address)
 }
 
 func (ctx *SSContext) StackResult(addressType int, address string, result IObject) {
 
+	finalAddress := address
+	if ctx.registryStack != nil {
+		finalAddress := ctx.IssueAddress()
+		ctx.registryStack.Append(address, finalAddress)
+	}
+
 	if result != nil {
 
-		fmt.Println(ctx.ID(), "stack result:", address, result.GetType())
+		fmt.Println(ctx.ID(), "stack result:", finalAddress, result.GetType())
 	}
 	if addressType == TokenSSRegistryGlobal {
 
-		ctx.Root.RegisterObject(address, result)
+		ctx.Root.RegisterObject(finalAddress, result)
 
 	} else if addressType == TokenSSRegistry {
 
-		ctx.RegisterObject(address, result)
+		ctx.RegisterObject(finalAddress, result)
 	}
-	if ctx.registryStack != nil {
 
-		ctx.registryStack.Append(address)
-	}
 }
 
 func (ctx *SSContext) SetStackRegistry(stack *SSAddressStack) {

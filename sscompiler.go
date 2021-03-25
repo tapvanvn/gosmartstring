@@ -171,6 +171,7 @@ func (compiler *SSCompiler) compileEach(token *gotokenize.Token, context *SSCont
 				return err
 			}
 		}
+		addressStack.Inc()
 	}
 
 	context.SetStackRegistry(nil)
