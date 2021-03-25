@@ -74,6 +74,27 @@ func (ctx *SSContext) RegisterObject(name string, object IObject) {
 		ctx.registryStack.Append(name, finalAddress)
 	}
 
+	if object != nil {
+		content := ""
+		if sstring, ok := object.(*SSString); ok {
+			content = sstring.Value
+			if len(content) > 30 {
+				content = content[:30]
+			}
+		}
+		if ctx.registryStack != nil {
+			fmt.Println(ctx.ID(), "stack result:", name, "->", finalAddress, object.GetType(), content)
+		} else {
+			fmt.Println(ctx.ID(), "stack result:", finalAddress, object.GetType(), content)
+		}
+	} else {
+		if ctx.registryStack != nil {
+			fmt.Println(ctx.ID(), "stack result nil:", name, "->", finalAddress)
+		} else {
+			fmt.Println(ctx.ID(), "stack result nil:", finalAddress, object.GetType())
+		}
+	}
+
 	ctx.registries[finalAddress] = CreateObjectRegistry(object)
 	ctx.registryCount++
 }
@@ -111,39 +132,13 @@ func (ctx *SSContext) GetRegistry(name string) *ssregistry {
 
 func (ctx *SSContext) StackResult(addressType int, address string, result IObject) {
 
-	finalAddress := address
-	if ctx.registryStack != nil {
-		finalAddress := ctx.IssueAddress()
-		ctx.registryStack.Append(address, finalAddress)
-	}
-
-	if result != nil {
-		content := ""
-		if sstring, ok := result.(*SSString); ok {
-			content = sstring.Value
-			if len(content) > 30 {
-				content = content[:30]
-			}
-		}
-		if ctx.registryStack != nil {
-			fmt.Println(ctx.ID(), "stack result:", address, "->", finalAddress, result.GetType(), content)
-		} else {
-			fmt.Println(ctx.ID(), "stack result:", finalAddress, result.GetType(), content)
-		}
-	} else {
-		if ctx.registryStack != nil {
-			fmt.Println(ctx.ID(), "stack result nil:", address, "->", finalAddress)
-		} else {
-			fmt.Println(ctx.ID(), "stack result nil:", finalAddress, result.GetType())
-		}
-	}
 	if addressType == TokenSSRegistryGlobal {
 
-		ctx.Root.RegisterObject(finalAddress, result)
+		ctx.Root.RegisterObject(address, result)
 
 	} else if addressType == TokenSSRegistry {
 
-		ctx.RegisterObject(finalAddress, result)
+		ctx.RegisterObject(address, result)
 	}
 
 }
