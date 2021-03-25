@@ -114,8 +114,13 @@ func (ctx *SSContext) SetStackRegistry(stack *SSAddressStack) {
 
 func (ctx *SSContext) BindingTo(context *SSContext) {
 	if context != ctx {
-		ctx.Root = context.Root
-		ctx.Parent = context
+		if context != nil {
+			ctx.Root = context.Root
+			ctx.Parent = context
+		} else {
+			ctx.Root = nil
+			ctx.Parent = nil
+		}
 	}
 }
 
