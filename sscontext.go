@@ -168,7 +168,14 @@ func (ctx *SSContext) PrintDebug(level int) {
 		if registry.Function != nil {
 			fmt.Printf("%s", name)
 		} else if registry.Object != nil {
-			fmt.Printf("%s-%s", name, gotokenize.ColorContent(registry.Object.GetType()))
+			content := ""
+			if sstring, ok := registry.Object.(*SSString); ok {
+				content = sstring.Value
+				if len(sstring.Value) > 30 {
+					content = sstring.Value[:30]
+				}
+			}
+			fmt.Printf("%s-%s : %s", name, gotokenize.ColorContent(registry.Object.GetType()), content)
 		} else {
 			fmt.Printf("%s-%s", name, gotokenize.ColorContent("nil"))
 		}
