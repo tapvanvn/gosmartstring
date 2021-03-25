@@ -30,6 +30,9 @@ type ssResultInfo struct {
 	endOffset   int
 }
 
+func (ctx *SSContext) ID() string {
+	return ctx.id.String()
+}
 func CreateContext(runtime *SSRuntime) *SSContext {
 
 	ctx := &SSContext{
@@ -124,21 +127,42 @@ func (ctx *SSContext) BindingTo(context *SSContext) {
 	}
 }
 
-func (ctx *SSContext) PrintDebug() {
+func (ctx *SSContext) PrintDebug(level int) {
 
-	if ctx.Parent != nil {
-
-		ctx.Parent.PrintDebug()
+	for i := 0; i <= level; i++ {
+		fmt.Print("|")
+		if i == 0 {
+			fmt.Printf("%s ", gotokenize.ColorName("ctx"))
+		}
+		fmt.Print(" ")
 	}
-	fmt.Println("context id:", ctx.id)
+	fmt.Println(ctx.id)
+
 	for name, registry := range ctx.registries {
 
-		if registry.Function != nil {
-			fmt.Println(name, "function")
-		} else if registry.Object != nil {
-			fmt.Println(name, "object", registry.Object.GetType())
-		} else {
-			fmt.Println(name, "object nil")
+		for i := 0; i <= level; i++ {
+			fmt.Print("|")
+			if i == 0 {
+				if registry.Function != nil {
+					fmt.Printf("%s ", gotokenize.ColorName("fnc"))
+				} else {
+					fmt.Printf("%s ", gotokenize.ColorName("obj"))
+				}
+			}
+			fmt.Print(" ")
 		}
+		if registry.Function != nil {
+			fmt.Printf("%s", name)
+		} else if registry.Object != nil {
+			fmt.Printf("%s-%s", name, gotokenize.ColorContent(registry.Object.GetType()))
+		} else {
+			fmt.Printf("%s-%s", name, gotokenize.ColorContent("nil"))
+		}
+
+		fmt.Println()
+	}
+	if ctx.Parent != nil {
+
+		ctx.Parent.PrintDebug(level + 1)
 	}
 }

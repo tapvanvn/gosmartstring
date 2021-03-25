@@ -17,7 +17,7 @@ func SSFuncTestDo(context *gosmartstring.SSContext, input gosmartstring.IObject,
 
 			id := sstring.Value
 
-			fmt.Print("id", id)
+			fmt.Println("id", id)
 		}
 	}
 	return nil
@@ -58,7 +58,7 @@ func TestSSInstructionDo(t *testing.T) {
 
 	compiler.Compile(&stream, context)
 
-	context.PrintDebug()
+	context.PrintDebug(0)
 }
 
 func TestSSInstructionEach(t *testing.T) {
