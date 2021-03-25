@@ -6,7 +6,6 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/tapvanvn/gotokenize"
-	"go.mongodb.org/mongo-driver/x/mongo/driver/uuid"
 )
 
 var _context_id = 0
