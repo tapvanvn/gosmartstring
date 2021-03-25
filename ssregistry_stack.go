@@ -20,8 +20,8 @@ func CreateAddressStack() SSAddressStack {
 }
 func (stack *SSAddressStack) Inc() {
 	stack.numStack++
+	stack.offset++
 	stack.Address = append(stack.Address, make(map[string]string, 0))
-
 }
 
 func (stack *SSAddressStack) Append(address string, translateAddress string) {
