@@ -99,6 +99,17 @@ func (ctx *SSContext) RegisterObject(name string, object IObject) {
 	ctx.registries[finalAddress] = CreateObjectRegistry(object)
 }
 
+func (ctx *SSContext) DebugCurrentStack() {
+	if ctx.registryStack != nil {
+		for address, translate := range ctx.registryStack.Address[ctx.registryStack.offset] {
+
+			fmt.Println("stack", ctx.registryStack.offset, address, "->", translate)
+		}
+	} else {
+		fmt.Println("no stack binding")
+	}
+}
+
 func (ctx *SSContext) RegisterFunction(name string, sfunc IFunction) {
 
 	finalAddress := name
