@@ -2,24 +2,24 @@ package gosmartstring
 
 type SSAddressStack struct {
 	IObject
-	Address   []map[string]string
-	offset    int
-	maxOffset int
+	Address  []map[string]string
+	offset   int
+	numStack int
 }
 
 func CreateAddressStack() SSAddressStack {
 
 	stack := SSAddressStack{
-		IObject:   &SSObject{},
-		Address:   make([]map[string]string, 0),
-		offset:    0,
-		maxOffset: 0,
+		IObject:  &SSObject{},
+		Address:  make([]map[string]string, 0),
+		offset:   0,
+		numStack: 1,
 	}
 	stack.Address = append(stack.Address, make(map[string]string, 0))
 	return stack
 }
 func (stack *SSAddressStack) Inc() {
-	stack.maxOffset++
+	stack.numStack++
 	stack.Address = append(stack.Address, make(map[string]string, 0))
 
 }
@@ -39,5 +39,5 @@ func (stack *SSAddressStack) SetStack(offset int) {
 }
 func (stack *SSAddressStack) GetStackNum() int {
 
-	return stack.maxOffset
+	return stack.numStack
 }
