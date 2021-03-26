@@ -116,7 +116,10 @@ func (compiler *SSCompiler) compileDo(token *gotokenize.Token, context *SSContex
 	}
 	compiler.callRegistry(name, params, context)
 	context.StackResult(output.Type, output.Content, context.This)
+	if !context.remember {
 
+		context.This = nil
+	}
 	return nil
 }
 
@@ -229,11 +232,5 @@ func (compiler *SSCompiler) callRegistry(name string, params []IObject, context 
 			fmt.Println("registry call fail")
 		}
 	}
-	if context.remember {
-
-		context.This = rs
-		context.remember = false
-	} else {
-		context.This = nil
-	}
+	context.This = rs
 }
