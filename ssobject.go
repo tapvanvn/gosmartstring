@@ -45,7 +45,10 @@ func (obj SSObject) Extend(functionName string, sfunc IFunction) {
 func (obj SSObject) Call(context *SSContext, name string, params []IObject) IObject {
 
 	if name == "json" {
-
+		if obj.CanExport() {
+			content := string(obj.Export(context))
+			return CreateSSJSON(content)
+		}
 	}
 	if sfunc, ok := obj.extendFunctions[name]; ok {
 

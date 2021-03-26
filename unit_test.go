@@ -142,3 +142,23 @@ func TestSSLInstruction(t *testing.T) {
 		token = meaning.Next()
 	}
 }
+
+func TestJSONMeaning(t *testing.T) {
+	jsonString := `{
+		"attr1":1,
+		"attr2":"attr2value"
+		}`
+	obj := gosmartstring.CreateSSJSON(jsonString)
+	value := obj.Call(nil, "attr1", nil)
+	if value != nil {
+		if sstring, ok := value.(*gosmartstring.SSString); ok {
+			fmt.Println(sstring.Value)
+		} else {
+			fmt.Println("not string")
+			t.Fail()
+		}
+	} else {
+		fmt.Println("value nil")
+		t.Fail()
+	}
+}
