@@ -212,8 +212,10 @@ func debugInstruction(token *gotokenize.Token, context *gosmartstring.SSContext)
 			fmt.Println(content)
 		}
 	} else {
-
+		fmt.Println("-----------------")
 		fmt.Println("not found")
+		context.PrintDebug(0)
+		fmt.Println("-----------------")
 	}
 }
 func TestSSLInstructionJSON(t *testing.T) {
@@ -227,7 +229,7 @@ func TestSSLInstructionJSON(t *testing.T) {
 	context.RegisterInterface("name", name)
 	context.RegisterInterface("names", names)
 	context.RegisterObject("str", gosmartstring.CreateString("stringvalue"))
-	content := "{{name.name}} def {{str}}"
+	content := "{{name.name}} def {{str}} {{str}} {{str}}"
 	meaning := gosmartstring.CreateSSInstructionMeaning()
 	stream := gotokenize.CreateStream()
 	stream.Tokenize(content)
@@ -241,12 +243,12 @@ func TestSSLInstructionJSON(t *testing.T) {
 		}
 		compileStream.AddToken(*token)
 	}
-	compileStream.Debug(0, nil)
+	//compileStream.Debug(0, nil)
 	compiler := gosmartstring.SSCompiler{}
 
 	compiler.Compile(&compileStream, context)
 
-	context.PrintDebug(0)
+	//ontext.PrintDebug(0)
 	iter := compileStream.Iterator()
 	debugCompiledStream(&iter, context)
 }

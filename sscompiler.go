@@ -120,6 +120,7 @@ func (compiler *SSCompiler) compileDo(token *gotokenize.Token, context *SSContex
 
 		context.This = nil
 	}
+	context.remember = false
 	return nil
 }
 
@@ -137,6 +138,7 @@ func (compiler *SSCompiler) compileExport(token *gotokenize.Token, context *SSCo
 
 		context.This = nil
 	}
+	context.remember = false
 	return nil
 }
 

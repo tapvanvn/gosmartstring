@@ -1,8 +1,6 @@
 package gosmartstring
 
 import (
-	"fmt"
-
 	"github.com/tapvanvn/gotokenize"
 )
 
@@ -46,7 +44,7 @@ func (meaning *SmarstringInstructionMeaning) buildSmarstring(token *gotokenize.T
 		if insToken == nil {
 			break
 		}
-		fmt.Println(insToken.Type, insToken.Content)
+
 		meaning.buildInstruction(insToken, &packToken, context)
 	}
 	return packToken
