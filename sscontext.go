@@ -2,14 +2,15 @@ package gosmartstring
 
 import (
 	"fmt"
-	"strconv"
 
 	"github.com/google/uuid"
 	"github.com/tapvanvn/gotokenize"
 )
 
+var _context_id = 0
+
 type SSContext struct {
-	id      uuid.UUID
+	id      int
 	Root    *SSContext
 	Parent  *SSContext
 	Level   int
@@ -31,12 +32,12 @@ type ssResultInfo struct {
 }
 
 func (ctx *SSContext) ID() string {
-	return ctx.id.String()
+	return fmt.Sprint(ctx.id)
 }
 func CreateContext(runtime *SSRuntime) *SSContext {
-
+	_context_id++
 	ctx := &SSContext{
-		id:            uuid.New(),
+		id:            _context_id,
 		Level:         0,
 		Parent:        nil,
 		Runtime:       runtime,
@@ -46,6 +47,7 @@ func CreateContext(runtime *SSRuntime) *SSContext {
 		registryCount: 0,
 		registryStack: nil,
 	}
+
 	ctx.Root = ctx
 	return ctx
 }
@@ -71,29 +73,8 @@ func (ctx *SSContext) RegisterObject(name string, object IObject) {
 
 	finalAddress := name
 	if ctx.registryStack != nil {
-		finalAddress = ctx.IssueAddress()
+		finalAddress = uuid.NewString()
 		ctx.registryStack.Append(name, finalAddress)
-	}
-
-	if object != nil {
-		content := ""
-		if sstring, ok := object.(*SSString); ok {
-			content = sstring.Value
-			if len(content) > 30 {
-				content = content[:30]
-			}
-		}
-		if ctx.registryStack != nil {
-			fmt.Println(ctx.ID(), "stack result:", name, "->", finalAddress, object.GetType(), content)
-		} else {
-			fmt.Println(ctx.ID(), "stack result:", finalAddress, object.GetType(), content)
-		}
-	} else {
-		if ctx.registryStack != nil {
-			fmt.Println(ctx.ID(), "stack result nil:", name, "->", finalAddress)
-		} else {
-			fmt.Println(ctx.ID(), "stack result nil:", finalAddress, object.GetType())
-		}
 	}
 
 	ctx.registries[finalAddress] = CreateObjectRegistry(object)
@@ -114,7 +95,7 @@ func (ctx *SSContext) RegisterFunction(name string, sfunc IFunction) {
 
 	finalAddress := name
 	if ctx.registryStack != nil {
-		finalAddress = ctx.IssueAddress()
+		finalAddress = uuid.NewString()
 		ctx.registryStack.Append(name, finalAddress)
 	}
 
@@ -123,7 +104,7 @@ func (ctx *SSContext) RegisterFunction(name string, sfunc IFunction) {
 
 func (ctx *SSContext) IssueAddress() string {
 	ctx.registryCount++
-	return strconv.Itoa(ctx.registryCount)
+	return uuid.NewString()
 }
 
 func (ctx *SSContext) GetRegistry(name string) *ssregistry {
@@ -183,11 +164,11 @@ func (ctx *SSContext) PrintDebug(level int) {
 	for i := 0; i <= level; i++ {
 		fmt.Print("|")
 		if i == 0 {
-			fmt.Printf("%s ", gotokenize.ColorName("ctx"))
+			fmt.Printf("%s ", gotokenize.ColorContent("ctx"))
 		}
 		fmt.Print(" ")
 	}
-	fmt.Println(ctx.id)
+	fmt.Println(gotokenize.ColorName(fmt.Sprint(ctx.id)))
 
 	for name, registry := range ctx.registries {
 

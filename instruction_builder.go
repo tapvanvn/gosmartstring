@@ -1,7 +1,6 @@
 package gosmartstring
 
 import (
-	"github.com/google/uuid"
 	"github.com/tapvanvn/gotokenize"
 )
 
@@ -23,7 +22,7 @@ func BuildDo(name string, params []IObject, context *SSContext) gotokenize.Token
 
 	for _, obj := range params {
 
-		registerName := uuid.New().String()
+		registerName := context.IssueAddress()
 
 		context.RegisterObject(registerName, obj)
 
