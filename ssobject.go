@@ -11,6 +11,7 @@ type IObject interface {
 	GetExtendFunc() map[string]IFunction
 	Call(context *SSContext, name string, params []IObject) IObject
 	Extend(functionName string, sfunc IFunction)
+	PrintDebug(level int)
 }
 
 //Object ssobject
@@ -55,4 +56,8 @@ func (obj SSObject) Call(context *SSContext, name string, params []IObject) IObj
 		return sfunc(context, &obj, params)
 	}
 	return nil
+}
+
+func (obj SSObject) PrintDebug(level int) {
+
 }

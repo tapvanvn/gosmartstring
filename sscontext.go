@@ -80,6 +80,19 @@ func (ctx *SSContext) RegisterObject(name string, object IObject) {
 	ctx.registries[finalAddress] = CreateObjectRegistry(object)
 }
 
+func (ctx *SSContext) RegisterInterface(name string, object interface{}) {
+
+	parseObject := ParseInterface(object)
+
+	finalAddress := name
+	if ctx.registryStack != nil {
+		finalAddress = uuid.NewString()
+		ctx.registryStack.Append(name, finalAddress)
+	}
+
+	ctx.registries[finalAddress] = CreateObjectRegistry(parseObject)
+}
+
 func (ctx *SSContext) DebugCurrentStack() {
 	if ctx.registryStack != nil {
 		for address, translate := range ctx.registryStack.Address[ctx.registryStack.offset] {

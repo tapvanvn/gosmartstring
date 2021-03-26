@@ -3,6 +3,8 @@ package gosmartstring
 import (
 	"github.com/tapvanvn/gotokenize"
 	"github.com/tapvanvn/gotokenize/json"
+
+	jsonEnc "encoding/json"
 )
 
 type SSJSON struct {
@@ -45,6 +47,58 @@ func CreateSSJSON(jsonString string) *SSJSON {
 	return jsonObj
 }
 
+func ParseInterface(object interface{}) IObject {
+	if data, err := jsonEnc.Marshal(object); err != nil {
+		return ParseJSONString(string(data))
+	}
+	return nil
+}
+
+func ParseJSONString(jsonString string) IObject {
+	stack := []IObject{}
+	if jsonString != "" {
+
+		stream := gotokenize.CreateStream()
+		stream.Tokenize(jsonString)
+		meaning := json.CreateJSONMeaning()
+
+		meaning.Prepare(&stream)
+
+		for {
+			token := meaning.Next()
+			if token == nil {
+				break
+			}
+
+			if token.Type == json.TokenJSONPair {
+
+				jsonObj := CreateSSJSON("")
+				parsePair(token, jsonObj)
+				stack = append(stack, jsonObj)
+
+			} else if token.Type == json.TokenJSONBlock {
+				jsonObj := CreateSSJSON("")
+				parseBlock(token, jsonObj)
+				stack = append(stack, jsonObj)
+			} else if token.Type == json.TokenJSONSquare {
+				array := CreateSSArray()
+				parseArray(token, array)
+				stack = append(stack, array)
+			}
+		}
+		numElement := len(stack)
+		if numElement == 1 {
+			return stack[0]
+		} else if numElement > 1 {
+			array := CreateSSArray()
+			for _, element := range stack {
+				array.Stack = append(array.Stack, element)
+			}
+			return array
+		}
+	}
+	return nil
+}
 func parseBlock(token *gotokenize.Token, object *SSJSON) {
 
 	iter := token.Children.Iterator()
@@ -92,7 +146,6 @@ func parsePair(token *gotokenize.Token, object *SSJSON) {
 		object.attributes[attribute] = valueObject
 		parseBlock(value, valueObject)
 	}
-
 }
 
 func parseArray(token *gotokenize.Token, object *SSArray) {
