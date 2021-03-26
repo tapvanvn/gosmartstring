@@ -135,7 +135,6 @@ func TestSSLInstruction(t *testing.T) {
 		if token == nil {
 			break
 		}
-		fmt.Println(token.Type, token.Content)
 
 		token.Children.Debug(0, nil)
 
@@ -178,4 +177,73 @@ func TestParseInterface(t *testing.T) {
 	context.RegisterInterface("name", name)
 	context.RegisterInterface("names", names)
 	context.PrintDebug(0)
+}
+func debugCompiledStream(iter *gotokenize.Iterator, context *gosmartstring.SSContext) {
+	for {
+		token := iter.Read()
+		if token == nil {
+			break
+		}
+		if token.Type == gosmartstring.TokenSSInstructionDo || token.Type == gosmartstring.TokenSSInstructionExport {
+			debugInstruction(token, context)
+		} else if token.Children.Length() > 0 {
+			childIter := token.Children.Iterator()
+			debugCompiledStream(&childIter, context)
+		}
+	}
+}
+func debugInstruction(token *gotokenize.Token, context *gosmartstring.SSContext) {
+	iter := token.Children.Iterator()
+	addressToken := iter.Get()
+	if addressToken.Type == gosmartstring.TokenSSRegistryIgnore {
+		return
+	}
+	fmt.Println("do:", token.Content, "address:", addressToken.Content)
+
+	obj := context.GetRegistry(addressToken.Content)
+
+	if obj != nil && obj.Object != nil {
+
+		fmt.Println("found", obj.Object.GetType())
+
+		if obj.Object.CanExport() {
+
+			content := string(obj.Object.Export(context))
+			fmt.Println(content)
+		}
+	} else {
+
+		fmt.Println("not found")
+	}
+}
+func TestSSLInstructionJSON(t *testing.T) {
+	name := &testInter{
+		Name: "testname",
+	}
+	names := []*testInter{
+		name,
+	}
+	context := gosmartstring.CreateContext(createRuntime())
+	context.RegisterInterface("name", name)
+	context.RegisterInterface("names", names)
+	content := "{{name.name}}"
+	meaning := gosmartstring.CreateSSInstructionMeaning()
+	stream := gotokenize.CreateStream()
+	stream.Tokenize(content)
+	meaning.Prepare(&stream, context)
+
+	compileStream := gotokenize.CreateStream()
+	for {
+		token := meaning.Next()
+		if token == nil {
+			break
+		}
+		compileStream.AddToken(*token)
+	}
+	compileStream.Debug(0, nil)
+	compiler := gosmartstring.SSCompiler{}
+
+	compiler.Compile(&compileStream, context)
+	iter := compileStream.Iterator()
+	debugCompiledStream(&iter, context)
 }

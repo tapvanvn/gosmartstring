@@ -114,6 +114,15 @@ func (compiler *SSCompiler) compileDo(token *gotokenize.Token, context *SSContex
 }
 
 func (compiler *SSCompiler) compileExport(token *gotokenize.Token, context *SSContext) error {
+	fmt.Println("try export")
+	iter := token.Children.Iterator()
+	output := iter.Read()
+	if output == nil {
+
+		return errors.New("instruction do syntax error")
+	}
+	fmt.Println("export to", output.Content)
+	context.StackResult(output.Type, output.Content, context.This)
 	return nil
 }
 
@@ -184,26 +193,29 @@ func (compiler *SSCompiler) callRegistry(name string, params []IObject, context 
 
 	var rs IObject = nil
 
-	if context.This != nil {
+	if !context.HotLink && context.This != nil {
 
 		rs = context.This.Call(context, name, params)
-	}
-	registry := context.GetRegistry(name)
-
-	if registry == nil {
-		//TODO: report registry nil
-		fmt.Println("cannot reach registry " + name)
-	} else if registry.Function != nil {
-
-		rs = registry.Function(context, context.This, params)
-
-	} else if registry.Object != nil && len(params) == 0 {
-
-		rs = registry.Object
 
 	} else {
 
-		fmt.Println("registry call fail")
+		registry := context.GetRegistry(name)
+
+		if registry == nil {
+			//TODO: report registry nil
+			fmt.Println("cannot reach registry " + name)
+		} else if registry.Function != nil {
+
+			rs = registry.Function(context, context.This, params)
+
+		} else if registry.Object != nil && len(params) == 0 {
+
+			rs = registry.Object
+
+		} else {
+
+			fmt.Println("registry call fail")
+		}
 	}
 
 	context.This = rs

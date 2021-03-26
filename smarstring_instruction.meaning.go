@@ -1,6 +1,10 @@
 package gosmartstring
 
-import "github.com/tapvanvn/gotokenize"
+import (
+	"fmt"
+
+	"github.com/tapvanvn/gotokenize"
+)
 
 type SmarstringInstructionMeaning struct {
 	SmarstringMeaning
@@ -15,6 +19,7 @@ func CreateSSInstructionMeaning() SmarstringInstructionMeaning {
 func (meaning *SmarstringInstructionMeaning) Prepare(stream *gotokenize.TokenStream, context *SSContext) {
 
 	meaning.SmarstringMeaning.Prepare(stream)
+
 	tmpStream := gotokenize.CreateStream()
 	token := meaning.SmarstringMeaning.Next()
 	for {
@@ -30,6 +35,7 @@ func (meaning *SmarstringInstructionMeaning) Prepare(stream *gotokenize.TokenStr
 	}
 	meaning.SetStream(tmpStream)
 }
+
 func (meaning *SmarstringInstructionMeaning) buildSmarstring(token *gotokenize.Token, context *SSContext) gotokenize.Token {
 	packToken := gotokenize.Token{
 		Type: TokenSSInstructionPack,
@@ -40,6 +46,7 @@ func (meaning *SmarstringInstructionMeaning) buildSmarstring(token *gotokenize.T
 		if insToken == nil {
 			break
 		}
+		fmt.Println(insToken.Type, insToken.Content)
 		meaning.buildInstruction(insToken, &packToken, context)
 	}
 	return packToken
@@ -47,13 +54,15 @@ func (meaning *SmarstringInstructionMeaning) buildSmarstring(token *gotokenize.T
 
 func (meaning *SmarstringInstructionMeaning) buildInstruction(token *gotokenize.Token, packToken *gotokenize.Token, context *SSContext) {
 	iter := token.Children.Iterator()
+	lastInstructionNum := packToken.Children.Length()
 	for {
 		childToken := iter.Read()
 		if childToken == nil {
 			break
 		}
+
 		if childToken.Type == TokenSSLCommand {
-			meaning.buildCommand(childToken, packToken, context)
+			meaning.buildCommand(childToken, false, packToken, context)
 		} else if childToken.Content == "+" {
 			packToken.Children.AddToken(gotokenize.Token{
 				Type: TokenSSInstructionLink,
@@ -64,15 +73,27 @@ func (meaning *SmarstringInstructionMeaning) buildInstruction(token *gotokenize.
 				Content: childToken.Content,
 			}
 			doToken.Children.AddToken(gotokenize.Token{
-				Type:    TokenSSRegistry,
+				Type:    TokenSSRegistryIgnore,
 				Content: context.IssueAddress(),
 			})
 			packToken.Children.AddToken(doToken)
 		}
 	}
+	if packToken.Children.Length() > lastInstructionNum {
+		//add and export here
+		exportToken := gotokenize.Token{
+			Type:    TokenSSInstructionExport,
+			Content: "",
+		}
+		exportToken.Children.AddToken(gotokenize.Token{
+			Type:    TokenSSRegistry,
+			Content: context.IssueAddress(),
+		})
+		packToken.Children.AddToken(exportToken)
+	}
 }
 
-func (meaning *SmarstringInstructionMeaning) buildCommand(token *gotokenize.Token, packToken *gotokenize.Token, context *SSContext) string {
+func (meaning *SmarstringInstructionMeaning) buildCommand(token *gotokenize.Token, isParam bool, packToken *gotokenize.Token, context *SSContext) string {
 	iter := token.Children.Iterator()
 
 	nameToken := iter.Read()
@@ -96,7 +117,7 @@ func (meaning *SmarstringInstructionMeaning) buildCommand(token *gotokenize.Toke
 				}
 				if childToken2.Type == TokenSSLCommand {
 
-					address := meaning.buildCommand(childToken2, packToken, context)
+					address := meaning.buildCommand(childToken2, true, packToken, context)
 					if address != "" {
 						params = append(params, gotokenize.Token{
 							Type:    TokenSSRegistry,
@@ -123,13 +144,20 @@ func (meaning *SmarstringInstructionMeaning) buildCommand(token *gotokenize.Toke
 			}
 		}
 	}
+
+	addressType := TokenSSRegistryIgnore
+	if isParam {
+
+		addressType = TokenSSRegistry
+	}
+
 	cmdAddress := context.IssueAddress()
 	doToken := gotokenize.Token{
 		Type:    TokenSSInstructionDo,
 		Content: nameToken.Content,
 	}
 	doToken.Children.AddToken(gotokenize.Token{
-		Type:    TokenSSRegistry,
+		Type:    addressType,
 		Content: cmdAddress,
 	})
 	for _, param := range params {
