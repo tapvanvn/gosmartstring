@@ -21,14 +21,15 @@ var (
 	TokenSSRegistry       = 201 //link to registry
 	TokenSSRegistryGlobal = 202 //set result registry address to global
 
-	TokenSSInstructionDo     = 300 //command to do
-	TokenSSInstructionLink   = 301 //link last instruction to be input of next instruction
-	TokenSSInstructionPack   = 302 //each children is an instruction
-	TokenSSInstructionExport = 303 //just export string
-	TokenSSInstructionIf     = 304 //if statement
-	TokenSSInstructionCase   = 305 //check in cases
-	TokenSSInstructionEach   = 306 //loop for each .. in .. and do
-	TokenSSInstructionCount  = 307 //count to and do
+	TokenSSInstructionDo       = 300 //command to do
+	TokenSSInstructionLink     = 301 //link last instruction to be input of next instruction
+	TokenSSInstructionRemember = 302 //set remember flag to true
+	TokenSSInstructionPack     = 303 //each children is an instruction
+	TokenSSInstructionExport   = 304 //just export string
+	TokenSSInstructionIf       = 305 //if statement
+	TokenSSInstructionCase     = 306 //check in cases
+	TokenSSInstructionEach     = 307 //loop for each .. in .. and do
+	TokenSSInstructionCount    = 308 //count to and do
 )
 
 var AllSSInstructions = []int{

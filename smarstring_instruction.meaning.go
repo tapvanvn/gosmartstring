@@ -68,6 +68,9 @@ func (meaning *SmarstringInstructionMeaning) buildInstruction(token *gotokenize.
 				Type: TokenSSInstructionLink,
 			})
 		} else if childToken.Content != "" {
+			packToken.Children.AddToken(gotokenize.Token{
+				Type: TokenSSInstructionRemember,
+			})
 			doToken := gotokenize.Token{
 				Type:    TokenSSInstructionDo,
 				Content: childToken.Content,
@@ -164,6 +167,9 @@ func (meaning *SmarstringInstructionMeaning) buildCommand(token *gotokenize.Toke
 
 		doToken.Children.AddToken(param)
 	}
+	packToken.Children.AddToken(gotokenize.Token{
+		Type: TokenSSInstructionRemember,
+	})
 	packToken.Children.AddToken(doToken)
 
 	return cmdAddress

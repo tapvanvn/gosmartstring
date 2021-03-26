@@ -34,7 +34,9 @@ func (compiler *SSCompiler) CompileToken(token *gotokenize.Token, context *SSCon
 
 	switch token.Type {
 	case TokenSSInstructionLink:
-
+		err = compiler.compileLink(token, context)
+	case TokenSSInstructionRemember:
+		err = compiler.compileRemember(token, context)
 	case TokenSSInstructionDo:
 		err = compiler.compileDo(token, context)
 	case TokenSSInstructionPack:
@@ -60,7 +62,12 @@ func (compiler *SSCompiler) CompileToken(token *gotokenize.Token, context *SSCon
 
 func (compiler *SSCompiler) compileLink(token *gotokenize.Token, context *SSContext) error {
 
-	context.HotLink = true
+	context.hotLink = true
+	return nil
+}
+func (compiler *SSCompiler) compileRemember(token *gotokenize.Token, context *SSContext) error {
+
+	context.remember = true
 	return nil
 }
 
@@ -114,15 +121,19 @@ func (compiler *SSCompiler) compileDo(token *gotokenize.Token, context *SSContex
 }
 
 func (compiler *SSCompiler) compileExport(token *gotokenize.Token, context *SSContext) error {
-	fmt.Println("try export")
+
 	iter := token.Children.Iterator()
 	output := iter.Read()
 	if output == nil {
 
 		return errors.New("instruction do syntax error")
 	}
-	fmt.Println("export to", output.Content)
+
 	context.StackResult(output.Type, output.Content, context.This)
+	if !context.remember {
+
+		context.This = nil
+	}
 	return nil
 }
 
@@ -193,7 +204,7 @@ func (compiler *SSCompiler) callRegistry(name string, params []IObject, context 
 
 	var rs IObject = nil
 
-	if !context.HotLink && context.This != nil {
+	if !context.hotLink && context.This != nil {
 
 		rs = context.This.Call(context, name, params)
 
@@ -204,6 +215,7 @@ func (compiler *SSCompiler) callRegistry(name string, params []IObject, context 
 		if registry == nil {
 			//TODO: report registry nil
 			fmt.Println("cannot reach registry " + name)
+
 		} else if registry.Function != nil {
 
 			rs = registry.Function(context, context.This, params)
@@ -217,6 +229,11 @@ func (compiler *SSCompiler) callRegistry(name string, params []IObject, context 
 			fmt.Println("registry call fail")
 		}
 	}
+	if context.remember {
 
-	context.This = rs
+		context.This = rs
+		context.remember = false
+	} else {
+		context.This = nil
+	}
 }

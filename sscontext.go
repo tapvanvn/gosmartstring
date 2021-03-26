@@ -16,9 +16,10 @@ type SSContext struct {
 	Level   int
 	Runtime *SSRuntime
 	This    IObject
-	HotLink bool
 
 	//not public
+	hotLink       bool
+	remember      bool
 	result        []IObject
 	registries    map[string]ssregistry
 	registryCount int
@@ -42,7 +43,8 @@ func CreateContext(runtime *SSRuntime) *SSContext {
 		Parent:        nil,
 		Runtime:       runtime,
 		This:          nil,
-		HotLink:       false,
+		hotLink:       false,
+		remember:      false,
 		registries:    map[string]ssregistry{},
 		registryCount: 0,
 		registryStack: nil,
