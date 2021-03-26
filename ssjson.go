@@ -48,7 +48,7 @@ func CreateSSJSON(jsonString string) *SSJSON {
 }
 
 func ParseInterface(object interface{}) IObject {
-	if data, err := jsonEnc.Marshal(object); err != nil {
+	if data, err := jsonEnc.Marshal(object); err == nil {
 		return ParseJSONString(string(data))
 	}
 	return nil
@@ -186,4 +186,12 @@ func (obj SSJSON) Call(context *SSContext, name string, params []IObject) IObjec
 	}
 
 	return obj.IObject.Call(context, name, params)
+}
+
+func (obj SSJSON) GetType() string {
+	return "ssjson"
+}
+
+func (obj SSJSON) CanExport() bool {
+	return false
 }

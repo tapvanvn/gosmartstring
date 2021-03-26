@@ -162,3 +162,20 @@ func TestJSONMeaning(t *testing.T) {
 		t.Fail()
 	}
 }
+
+type testInter struct {
+	Name string `json:"name"`
+}
+
+func TestParseInterface(t *testing.T) {
+	name := &testInter{
+		Name: "testname",
+	}
+	names := []*testInter{
+		name,
+	}
+	context := gosmartstring.CreateContext(createRuntime())
+	context.RegisterInterface("name", name)
+	context.RegisterInterface("names", names)
+	context.PrintDebug(0)
+}
