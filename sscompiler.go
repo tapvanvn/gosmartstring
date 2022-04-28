@@ -23,6 +23,7 @@ func (compiler *SSCompiler) Compile(stream *gotokenize.TokenStream, context *SSC
 			break
 		}
 		if err := compiler.CompileToken(token, context); err != nil {
+			fmt.Println("compile error :", err.Error())
 			return err
 		}
 	}

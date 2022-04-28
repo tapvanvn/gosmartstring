@@ -73,11 +73,12 @@ func (ctx *SSContext) CreateSubContext() *SSContext {
 func (ctx *SSContext) RegisterObject(name string, object IObject) {
 
 	finalAddress := name
+
 	if ctx.registryStack != nil {
 		finalAddress = ctx.IssueAddress()
 		ctx.registryStack.Append(name, finalAddress)
 	}
-
+	fmt.Printf("res obj: name:%s final:%s\n", name, finalAddress)
 	ctx.registries[finalAddress] = CreateObjectRegistry(object)
 }
 
