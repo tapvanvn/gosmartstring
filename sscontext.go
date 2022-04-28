@@ -3,7 +3,6 @@ package gosmartstring
 import (
 	"fmt"
 
-	"github.com/google/uuid"
 	"github.com/tapvanvn/gotokenize/v2"
 )
 
@@ -75,10 +74,10 @@ func (ctx *SSContext) RegisterObject(name string, object IObject) {
 
 	finalAddress := name
 	if ctx.registryStack != nil {
-		finalAddress = uuid.NewString()
+		finalAddress = ctx.IssueAddress()
 		ctx.registryStack.Append(name, finalAddress)
 	}
-
+	fmt.Printf("[%d] registerObject %s type:%s", ctx.id, name, object.GetType())
 	ctx.registries[finalAddress] = CreateObjectRegistry(object)
 }
 
@@ -88,7 +87,7 @@ func (ctx *SSContext) RegisterInterface(name string, object interface{}) {
 
 	finalAddress := name
 	if ctx.registryStack != nil {
-		finalAddress = uuid.NewString()
+		finalAddress = ctx.IssueAddress()
 		ctx.registryStack.Append(name, finalAddress)
 	}
 
@@ -110,7 +109,7 @@ func (ctx *SSContext) RegisterFunction(name string, sfunc IFunction) {
 
 	finalAddress := name
 	if ctx.registryStack != nil {
-		finalAddress = uuid.NewString()
+		finalAddress = ctx.IssueAddress()
 		ctx.registryStack.Append(name, finalAddress)
 	}
 
@@ -119,7 +118,7 @@ func (ctx *SSContext) RegisterFunction(name string, sfunc IFunction) {
 
 func (ctx *SSContext) IssueAddress() string {
 	ctx.registryCount++
-	return uuid.NewString()
+	return fmt.Sprintf("%d", ctx.registryCount)
 }
 
 func (ctx *SSContext) GetRegistry(name string) *ssregistry {

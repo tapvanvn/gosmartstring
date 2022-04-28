@@ -19,8 +19,9 @@ func (meaning *SmarstringInstructionMeaning) Prepare(proc *gotokenize.MeaningPro
 	meaning.SmarstringMeaning.Prepare(proc)
 
 	tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
-	token := meaning.SmarstringMeaning.Next(proc)
+
 	for {
+		token := meaning.SmarstringMeaning.Next(proc)
 		if token == nil {
 			break
 		}
@@ -29,7 +30,6 @@ func (meaning *SmarstringInstructionMeaning) Prepare(proc *gotokenize.MeaningPro
 		} else {
 			tmpStream.AddToken(*token)
 		}
-		token = meaning.SmarstringMeaning.Next(proc)
 	}
 	proc.SetStream(proc.Context.AncestorTokens, &tmpStream)
 }
