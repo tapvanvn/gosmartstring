@@ -17,11 +17,11 @@ type SSCompiler struct {
 func (compiler *SSCompiler) Compile(stream *gotokenize.TokenStream, context *SSContext) error {
 	iter := stream.Iterator()
 	for {
-		if iter.EOS() {
-			break
-		}
 
 		token := iter.Read()
+		if token == nil {
+			break
+		}
 		if err := compiler.CompileToken(token, context); err != nil {
 			return err
 		}
@@ -54,10 +54,8 @@ func (compiler *SSCompiler) CompileToken(token *gotokenize.Token, context *SSCon
 	default:
 		err = compiler.Compile(&token.Children, context)
 	}
-	if err != nil {
-		return err
-	}
-	return nil
+
+	return err
 }
 
 func (compiler *SSCompiler) compileLink(token *gotokenize.Token, context *SSContext) error {
@@ -75,8 +73,8 @@ func (compiler *SSCompiler) compilePack(token *gotokenize.Token, context *SSCont
 
 	//subContext := context.CreateSubContext()
 
-	err := compiler.Compile(&token.Children, context)
-	if err != nil {
+	if err := compiler.Compile(&token.Children, context); err != nil {
+
 		return err
 	}
 	return nil
@@ -95,10 +93,11 @@ func (compiler *SSCompiler) compileDo(token *gotokenize.Token, context *SSContex
 
 	params := []IObject{}
 	for {
-		if iter.EOS() {
+
+		childToken := iter.Read()
+		if childToken == nil {
 			break
 		}
-		childToken := iter.Read()
 
 		if childToken.Type == TokenSSRegistry {
 
@@ -192,8 +191,7 @@ func (compiler *SSCompiler) compileEach(token *gotokenize.Token, context *SSCont
 			if childToken == nil {
 				break
 			}
-			err := compiler.CompileToken(childToken, context)
-			if err != nil {
+			if err := compiler.CompileToken(childToken, context); err != nil {
 				return err
 			}
 		}
@@ -237,6 +235,7 @@ func (compiler *SSCompiler) callRegistry(name string, params []IObject, context 
 		} else {
 
 			fmt.Println("registry call fail")
+			return errors.New("registry unknown: " + name)
 		}
 	}
 	context.This = rs
