@@ -1,7 +1,7 @@
 package gosmartstring
 
 import (
-	"github.com/tapvanvn/gotokenize"
+	"github.com/tapvanvn/gotokenize/v2"
 )
 
 func BuildDo(name string, params []IObject, context *SSContext) gotokenize.Token {

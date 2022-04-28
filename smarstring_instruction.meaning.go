@@ -1,7 +1,7 @@
 package gosmartstring
 
 import (
-	"github.com/tapvanvn/gotokenize"
+	"github.com/tapvanvn/gotokenize/v2"
 )
 
 type SmarstringInstructionMeaning struct {
@@ -14,12 +14,12 @@ func CreateSSInstructionMeaning() SmarstringInstructionMeaning {
 	}
 }
 
-func (meaning *SmarstringInstructionMeaning) Prepare(stream *gotokenize.TokenStream, context *SSContext) {
+func (meaning *SmarstringInstructionMeaning) Prepare(proc *gotokenize.MeaningProcess, context *SSContext) {
 
-	meaning.SmarstringMeaning.Prepare(stream)
+	meaning.SmarstringMeaning.Prepare(proc)
 
-	tmpStream := gotokenize.CreateStream()
-	token := meaning.SmarstringMeaning.Next()
+	tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
+	token := meaning.SmarstringMeaning.Next(proc)
 	for {
 		if token == nil {
 			break
@@ -29,9 +29,9 @@ func (meaning *SmarstringInstructionMeaning) Prepare(stream *gotokenize.TokenStr
 		} else {
 			tmpStream.AddToken(*token)
 		}
-		token = meaning.SmarstringMeaning.Next()
+		token = meaning.SmarstringMeaning.Next(proc)
 	}
-	meaning.SetStream(tmpStream)
+	proc.SetStream(proc.Context.AncestorTokens, &tmpStream)
 }
 
 func (meaning *SmarstringInstructionMeaning) buildSmarstring(token *gotokenize.Token, context *SSContext) gotokenize.Token {

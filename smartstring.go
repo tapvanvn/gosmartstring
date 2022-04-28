@@ -1,6 +1,6 @@
 package gosmartstring
 
-import "github.com/tapvanvn/gotokenize"
+import "github.com/tapvanvn/gotokenize/v2"
 
 var (
 	//MARK: smartstring

@@ -1,13 +1,13 @@
 package gosmartstring
 
 import (
-	"github.com/tapvanvn/gotokenize"
+	"github.com/tapvanvn/gotokenize/v2"
 )
 
 const ()
 
 type SmarstringRawMeaning struct {
-	gotokenize.RawMeaning
+	*gotokenize.AbstractMeaning
 	IsSmartstringOnly bool
 }
 
@@ -18,18 +18,18 @@ func CreateSSRawMeaning() SmarstringRawMeaning {
 	}
 	meaning := gotokenize.CreateRawMeaning(tokenMap, false)
 	return SmarstringRawMeaning{
-		RawMeaning:        meaning,
+		AbstractMeaning:   gotokenize.NewAbtractMeaning(meaning),
 		IsSmartstringOnly: false,
 	}
 }
 
-func (meaning *SmarstringRawMeaning) Prepare(stream *gotokenize.TokenStream) {
+func (meaning *SmarstringRawMeaning) Prepare(proc *gotokenize.MeaningProcess) {
 
-	meaning.RawMeaning.Prepare(stream)
-	tmpStream := gotokenize.CreateStream()
+	meaning.AbstractMeaning.Prepare(proc)
+	tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
 	meaning.IsSmartstringOnly = true
 
-	iter := meaning.GetIter()
+	iter := proc.Iter
 	for {
 		if iter.EOS() {
 			break
@@ -72,7 +72,7 @@ func (meaning *SmarstringRawMeaning) Prepare(stream *gotokenize.TokenStream) {
 			tmpStream.AddToken(*token)
 		}
 	}
-	meaning.SetStream(tmpStream)
+	proc.SetStream(proc.Context.AncestorTokens, &tmpStream)
 }
 
 func (meaning *SmarstringRawMeaning) continueSmartString(iter *gotokenize.Iterator) gotokenize.Token {
@@ -118,7 +118,7 @@ func (meaning *SmarstringRawMeaning) meaningSmartString(token gotokenize.Token) 
 		Type: TokenSSLSmarstring,
 	}
 
-	meaningToken := meaning.getNextMeaningToken(&iter)
+	meaningToken := meaning.getNextMeaningToken(iter)
 
 	for {
 		if meaningToken == nil {
@@ -126,7 +126,7 @@ func (meaning *SmarstringRawMeaning) meaningSmartString(token gotokenize.Token) 
 		}
 		newToken.Children.AddToken(*meaningToken)
 
-		meaningToken = meaning.getNextMeaningToken(&iter)
+		meaningToken = meaning.getNextMeaningToken(iter)
 	}
 	return newToken
 }

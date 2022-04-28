@@ -1,28 +1,28 @@
 package gosmartstring
 
 import (
-	"github.com/tapvanvn/gotokenize"
+	"github.com/tapvanvn/gotokenize/v2"
 )
 
 type SmarstringMeaning struct {
-	gotokenize.PatternMeaning
+	*gotokenize.AbstractMeaning
+	//gotokenize.PatternMeaning
 }
 
 func CreateSSMeaning() SmarstringMeaning {
 	meaning := CreateSSRawMeaning()
 	return SmarstringMeaning{
-		PatternMeaning: gotokenize.CreatePatternMeaning(&meaning, SSLPatterns, SSLIgnores, SSLGlobalNested),
+		AbstractMeaning: gotokenize.NewAbtractMeaning(gotokenize.NewPatternMeaning(&meaning, SSLPatterns, SSLIgnores, SSLGlobalNested, gotokenize.NoTokens)),
 	}
 }
 
-func (meaning *SmarstringMeaning) Prepare(stream *gotokenize.TokenStream) {
+func (meaning *SmarstringMeaning) Prepare(process *gotokenize.MeaningProcess) {
 
-	meaning.PatternMeaning.Prepare(stream)
+	meaning.AbstractMeaning.Prepare(process)
 
-	tmpStream := gotokenize.CreateStream()
-	//SmartStringOnly := true
+	tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
 
-	var token = meaning.PatternMeaning.Next()
+	var token = meaning.AbstractMeaning.Next(process)
 
 	for {
 		if token == nil {
@@ -35,16 +35,12 @@ func (meaning *SmarstringMeaning) Prepare(stream *gotokenize.TokenStream) {
 
 		} else {
 
-			//SmartStringOnly = false
-
 			tmpStream.AddToken(*token)
 		}
 
-		token = meaning.PatternMeaning.Next()
+		token = meaning.AbstractMeaning.Next(process)
 	}
-
-	meaning.SetStream(tmpStream)
-	//tmpStream.Debug(0, nil)
+	process.SetStream(process.Context.AncestorTokens, &tmpStream)
 }
 
 func (meaning *SmarstringMeaning) parseInstruction(token *gotokenize.Token) gotokenize.Token {
@@ -60,7 +56,7 @@ func (meaning *SmarstringMeaning) parseInstruction(token *gotokenize.Token) goto
 
 	iter := token.Children.Iterator()
 
-	meaningToken := meaning.getNextInstruction(&iter)
+	meaningToken := meaning.getNextInstruction(iter)
 
 	for {
 		if meaningToken == nil {
@@ -69,7 +65,7 @@ func (meaning *SmarstringMeaning) parseInstruction(token *gotokenize.Token) goto
 
 		newToken.Children.AddToken(*meaningToken)
 
-		meaningToken = meaning.getNextInstruction(&iter)
+		meaningToken = meaning.getNextInstruction(iter)
 	}
 
 	return newToken

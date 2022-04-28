@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/tapvanvn/gosmartstring"
-	"github.com/tapvanvn/gotokenize"
+	"github.com/tapvanvn/gotokenize/v2"
 )
 
 func SSFuncTestDo(context *gosmartstring.SSContext, input gosmartstring.IObject, params []gosmartstring.IObject) gosmartstring.IObject {
@@ -47,7 +47,7 @@ func createRuntime() *gosmartstring.SSRuntime {
 
 func TestSSInstructionDo(t *testing.T) {
 	context := gosmartstring.CreateContext(createRuntime())
-	stream := gotokenize.CreateStream()
+	stream := gotokenize.CreateStream(0)
 	instructionDo := gosmartstring.BuildDo("testDo",
 		[]gosmartstring.IObject{
 			gosmartstring.CreateString("test:html/index.html"),
@@ -63,7 +63,7 @@ func TestSSInstructionDo(t *testing.T) {
 
 func TestSSInstructionEach(t *testing.T) {
 	context := gosmartstring.CreateContext(createRuntime())
-	stream := gotokenize.CreateStream()
+	stream := gotokenize.CreateStream(0)
 
 	ssArray := gosmartstring.CreateSSArray()
 	ssArray.Stack = append(ssArray.Stack, gosmartstring.CreateString("e1"))
@@ -88,38 +88,40 @@ func TestSSLMeaning(t *testing.T) {
 
 	content := "{{testDo(\"abc\").test, testDo(\"bcd\").test+put(a)}}"
 	meaning := gosmartstring.CreateSSMeaning()
-	stream := gotokenize.CreateStream()
+	stream := gotokenize.CreateStream(0)
 	stream.Tokenize(content)
-	meaning.Prepare(&stream)
-	token := meaning.Next()
+	proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &stream)
+	meaning.Prepare(proc)
+	token := meaning.Next(proc)
 	for {
 		if token == nil {
 			break
 		}
 		fmt.Println(token.Type, token.Content)
 		if token.Type == gosmartstring.TokenSSLSmarstring {
-			token.Children.Debug(0, nil)
+			token.Children.Debug(0, nil, nil)
 		}
-		token = meaning.Next()
+		token = meaning.Next(proc)
 	}
 }
 func TestSSLMeaning2(t *testing.T) {
 
 	content := "{{testDo(testDo3(\"hey\"), \"hello\").test, testDo(\"bcd\").test+put(a)}}"
 	meaning := gosmartstring.CreateSSMeaning()
-	stream := gotokenize.CreateStream()
+	stream := gotokenize.CreateStream(0)
 	stream.Tokenize(content)
-	meaning.Prepare(&stream)
-	token := meaning.Next()
+	proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &stream)
+	meaning.Prepare(proc)
+	token := meaning.Next(proc)
 	for {
 		if token == nil {
 			break
 		}
 		fmt.Println(token.Type, token.Content)
 		if token.Type == gosmartstring.TokenSSLSmarstring {
-			token.Children.Debug(0, nil)
+			token.Children.Debug(0, nil, nil)
 		}
-		token = meaning.Next()
+		token = meaning.Next(proc)
 	}
 }
 
@@ -127,18 +129,19 @@ func TestSSLInstruction(t *testing.T) {
 	context := gosmartstring.CreateContext(createRuntime())
 	content := "normal {{testDo(testDo3(\"hey\"), \"hello\").test, testDo(\"bcd\").test+put(a)}}"
 	meaning := gosmartstring.CreateSSInstructionMeaning()
-	stream := gotokenize.CreateStream()
+	stream := gotokenize.CreateStream(0)
 	stream.Tokenize(content)
-	meaning.Prepare(&stream, context)
-	token := meaning.Next()
+	proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &stream)
+	meaning.Prepare(proc, context)
+	token := meaning.Next(proc)
 	for {
 		if token == nil {
 			break
 		}
 
-		token.Children.Debug(0, nil)
+		token.Children.Debug(0, nil, nil)
 
-		token = meaning.Next()
+		token = meaning.Next(proc)
 	}
 }
 
@@ -188,7 +191,7 @@ func debugCompiledStream(iter *gotokenize.Iterator, context *gosmartstring.SSCon
 			debugInstruction(token, context)
 		} else if token.Children.Length() > 0 {
 			childIter := token.Children.Iterator()
-			debugCompiledStream(&childIter, context)
+			debugCompiledStream(childIter, context)
 		}
 	}
 }
@@ -231,13 +234,14 @@ func TestSSLInstructionJSON(t *testing.T) {
 	context.RegisterObject("str", gosmartstring.CreateString("stringvalue"))
 	content := "{{name.name}} def {{str}} {{str}} {{str}}"
 	meaning := gosmartstring.CreateSSInstructionMeaning()
-	stream := gotokenize.CreateStream()
+	stream := gotokenize.CreateStream(0)
 	stream.Tokenize(content)
-	meaning.Prepare(&stream, context)
+	proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &stream)
+	meaning.Prepare(proc, context)
 
-	compileStream := gotokenize.CreateStream()
+	compileStream := gotokenize.CreateStream(0)
 	for {
-		token := meaning.Next()
+		token := meaning.Next(proc)
 		if token == nil {
 			break
 		}
@@ -250,5 +254,5 @@ func TestSSLInstructionJSON(t *testing.T) {
 
 	//ontext.PrintDebug(0)
 	iter := compileStream.Iterator()
-	debugCompiledStream(&iter, context)
+	debugCompiledStream(iter, context)
 }

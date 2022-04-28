@@ -1,8 +1,8 @@
 package gosmartstring
 
 import (
-	"github.com/tapvanvn/gotokenize"
-	"github.com/tapvanvn/gotokenize/json"
+	"github.com/tapvanvn/gotokenize/v2"
+	"github.com/tapvanvn/gotokenize/v2/json"
 
 	jsonEnc "encoding/json"
 )
@@ -21,14 +21,15 @@ func CreateSSJSON(jsonString string) *SSJSON {
 
 	if jsonString != "" {
 
-		stream := gotokenize.CreateStream()
+		stream := gotokenize.CreateStream(0)
 		stream.Tokenize(jsonString)
 		meaning := json.CreateJSONMeaning()
 
-		meaning.Prepare(&stream)
+		proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &stream)
+		meaning.Prepare(proc)
 
 		for {
-			token := meaning.Next()
+			token := meaning.Next(proc)
 			if token == nil {
 				break
 			}
@@ -58,14 +59,15 @@ func ParseJSONString(jsonString string) IObject {
 	stack := []IObject{}
 	if jsonString != "" {
 
-		stream := gotokenize.CreateStream()
+		stream := gotokenize.CreateStream(0)
 		stream.Tokenize(jsonString)
 		meaning := json.CreateJSONMeaning()
 
-		meaning.Prepare(&stream)
+		proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &stream)
+		meaning.Prepare(proc)
 
 		for {
-			token := meaning.Next()
+			token := meaning.Next(proc)
 			if token == nil {
 				break
 			}
