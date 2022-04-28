@@ -218,6 +218,7 @@ func (compiler *SSCompiler) callRegistry(name string, params []IObject, context 
 		if registry == nil {
 			//TODO: report registry nil
 			fmt.Println("cannot reach registry " + name)
+			context.PrintDebug(0)
 
 		} else if registry.Function != nil {
 
