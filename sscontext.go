@@ -135,11 +135,11 @@ func (ctx *SSContext) GetRegistry(name string) *ssregistry {
 	}
 
 	if registry, ok := ctx.registries[address]; ok {
-		fmt.Printf("get registry found :%s\n", name)
+		fmt.Printf("get registry found :%s address:%s\n", name, address)
 		return &registry
 
 	} else if ctx.Parent != nil {
-		fmt.Printf("get registry give to parent :%s\n", name)
+		fmt.Printf("get registry give to parent :%s address:%s\n", name, address)
 		return ctx.Parent.GetRegistry(address)
 	}
 

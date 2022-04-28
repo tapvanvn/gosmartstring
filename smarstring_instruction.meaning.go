@@ -5,23 +5,24 @@ import (
 )
 
 type SmarstringInstructionMeaning struct {
-	SmarstringMeaning
+	*gotokenize.AbstractMeaning
+	//SmarstringMeaning
 }
 
 func CreateSSInstructionMeaning() SmarstringInstructionMeaning {
 	return SmarstringInstructionMeaning{
-		SmarstringMeaning: CreateSSMeaning(),
+		AbstractMeaning: gotokenize.NewAbtractMeaning(CreateSSMeaning()),
 	}
 }
 
 func (meaning *SmarstringInstructionMeaning) Prepare(proc *gotokenize.MeaningProcess, context *SSContext) {
 
-	meaning.SmarstringMeaning.Prepare(proc)
+	meaning.AbstractMeaning.Prepare(proc)
 
 	tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
 
 	for {
-		token := meaning.SmarstringMeaning.Next(proc)
+		token := meaning.AbstractMeaning.Next(proc)
 		if token == nil {
 			break
 		}

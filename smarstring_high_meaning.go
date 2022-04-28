@@ -9,9 +9,9 @@ type SmarstringMeaning struct {
 	//gotokenize.PatternMeaning
 }
 
-func CreateSSMeaning() SmarstringMeaning {
+func CreateSSMeaning() *SmarstringMeaning {
 	meaning := CreateSSRawMeaning()
-	return SmarstringMeaning{
+	return &SmarstringMeaning{
 		AbstractMeaning: gotokenize.NewAbtractMeaning(gotokenize.NewPatternMeaning(&meaning, SSLPatterns, SSLIgnores, SSLGlobalNested, gotokenize.NoTokens)),
 	}
 }
