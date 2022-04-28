@@ -77,7 +77,7 @@ func (ctx *SSContext) RegisterObject(name string, object IObject) {
 		finalAddress = ctx.IssueAddress()
 		ctx.registryStack.Append(name, finalAddress)
 	}
-	fmt.Printf("[%d] registerObject %s type:%s", ctx.id, name, object.GetType())
+	fmt.Printf("[%d] registerObject %s type:%s\n", ctx.id, name, object.GetType())
 	ctx.registries[finalAddress] = CreateObjectRegistry(object)
 }
 
