@@ -164,8 +164,6 @@ func (compiler *SSCompiler) compileEach(token *gotokenize.Token, context *SSCont
 	}
 	elementName := elementNameToken.Content
 
-	//fmt.Println("arrayName:", arrayName, "elementName:", elementName)
-
 	arrayObject := context.GetRegistry(arrayName)
 	array, ok := arrayObject.Object.(*SSArray)
 

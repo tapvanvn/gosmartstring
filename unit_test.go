@@ -8,6 +8,11 @@ import (
 	"github.com/tapvanvn/gotokenize/v2"
 )
 
+func printUtf8(content string) {
+	for _, c := range content {
+		fmt.Printf("%c", c)
+	}
+}
 func SSFuncTestDo(context *gosmartstring.SSContext, input gosmartstring.IObject, params []gosmartstring.IObject) gosmartstring.IObject {
 
 	fmt.Println("call SSFuncTestDo", len(params))
@@ -133,15 +138,13 @@ func TestSSLInstruction(t *testing.T) {
 	stream.Tokenize(content)
 	proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &stream)
 	meaning.Prepare(proc, context)
-	token := meaning.Next(proc)
+
 	for {
+		token := meaning.Next(proc)
 		if token == nil {
 			break
 		}
-
 		token.Children.Debug(0, nil, nil)
-
-		token = meaning.Next(proc)
 	}
 }
 
