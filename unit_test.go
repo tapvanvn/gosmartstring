@@ -103,7 +103,7 @@ func TestSSLMeaning(t *testing.T) {
 			break
 		}
 		fmt.Println(token.Type, token.Content)
-		if token.Type == gosmartstring.TokenSSLSmarstring {
+		if token.Type == gosmartstring.TokenSSLSmartstring {
 			token.Children.Debug(0, nil, nil)
 		}
 		token = meaning.Next(proc)
@@ -123,7 +123,7 @@ func TestSSLMeaning2(t *testing.T) {
 			break
 		}
 		fmt.Println(token.Type, token.Content)
-		if token.Type == gosmartstring.TokenSSLSmarstring {
+		if token.Type == gosmartstring.TokenSSLSmartstring {
 			token.Children.Debug(0, nil, nil)
 		}
 		token = meaning.Next(proc)
@@ -250,6 +250,7 @@ func TestSSLInstructionJSON(t *testing.T) {
 		}
 		compileStream.AddToken(*token)
 	}
+	compileStream.Debug(0, gosmartstring.SSNaming, nil)
 	//compileStream.Debug(0, nil)
 	compiler := gosmartstring.SSCompiler{}
 

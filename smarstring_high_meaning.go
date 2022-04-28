@@ -29,7 +29,7 @@ func (meaning *SmarstringMeaning) Prepare(process *gotokenize.MeaningProcess) {
 			break
 		}
 
-		if token.Type == TokenSSLSmarstring {
+		if token.Type == TokenSSLSmartstring {
 
 			tmpStream.AddToken(meaning.parseInstruction(token))
 
@@ -45,7 +45,7 @@ func (meaning *SmarstringMeaning) Prepare(process *gotokenize.MeaningProcess) {
 
 func (meaning *SmarstringMeaning) parseInstruction(token *gotokenize.Token) gotokenize.Token {
 
-	if token.Type != TokenSSLSmarstring && token.Type != TokenSSLParenthese {
+	if token.Type != TokenSSLSmartstring && token.Type != TokenSSLParenthese {
 
 		return *token
 	}

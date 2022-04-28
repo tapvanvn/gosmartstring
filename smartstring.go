@@ -13,7 +13,7 @@ var (
 
 	TokenSSLCommand      = 100
 	TokenSSLInstruction  = 101
-	TokenSSLSmarstring   = 102
+	TokenSSLSmartstring  = 102
 	TokenSSLNormalstring = 103
 
 	//MARK:
@@ -57,7 +57,7 @@ func SSInsructionMove(delta int) {
 
 	TokenSSLCommand += delta
 	TokenSSLInstruction += delta
-	TokenSSLSmarstring += delta
+	TokenSSLSmartstring += delta
 	TokenSSLNormalstring += delta
 
 	//MARK:
@@ -77,7 +77,7 @@ func SSInsructionMove(delta int) {
 }
 
 var SSLGlobalNested = []int{
-	TokenSSLSmarstring,
+	TokenSSLSmartstring,
 }
 var SSLIgnores = []int{}
 
@@ -91,4 +91,51 @@ var SSLPatterns = []gotokenize.Pattern{
 		},
 		IsRemoveGlobalIgnore: true,
 	},
+}
+
+func SSNaming(tokenType int) string {
+	switch tokenType {
+	case TokenSSLOperator:
+		return "ss_operator"
+	case TokenSSLString:
+		return "ss_string"
+	case TokenSSLParenthese:
+		return "ss_parenthese"
+	case TokenSSLBlock:
+		return "ss_block"
+	case TokenSSLSquare:
+		return "ss_square"
+	case TokenSSLCommand:
+		return "ss_command"
+	case TokenSSLInstruction:
+		return "ss_instruction"
+	case TokenSSLSmartstring:
+		return "ss_smartstring"
+	case TokenSSLNormalstring:
+		return "ss_normalstring"
+	case TokenSSRegistryIgnore:
+		return "ss_registry_ignore"
+	case TokenSSRegistry:
+		return "ss_registry"
+	case TokenSSRegistryGlobal:
+		return "ss_registry_global"
+	case TokenSSInstructionDo:
+		return "ss_do"
+	case TokenSSInstructionLink:
+		return "ss_link"
+	case TokenSSInstructionPack:
+		return "ss_pack"
+	case TokenSSInstructionExport:
+		return "ss_export"
+	case TokenSSInstructionIf:
+		return "ss_if"
+	case TokenSSInstructionCase:
+		return "ss_case"
+	case TokenSSInstructionEach:
+		return "ss_each"
+	case TokenSSInstructionCount:
+		return "ss_count"
+	default:
+		return "unknown"
+	}
 }

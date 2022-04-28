@@ -78,7 +78,7 @@ func (meaning *SmarstringRawMeaning) Prepare(proc *gotokenize.MeaningProcess) {
 func (meaning *SmarstringRawMeaning) continueSmartString(iter *gotokenize.Iterator) gotokenize.Token {
 
 	rsToken := gotokenize.Token{
-		Type: TokenSSLSmarstring,
+		Type: TokenSSLSmartstring,
 	}
 
 	for {
@@ -115,7 +115,7 @@ func (meaning *SmarstringRawMeaning) meaningSmartString(token gotokenize.Token) 
 	iter := token.Children.Iterator()
 
 	newToken := gotokenize.Token{
-		Type: TokenSSLSmarstring,
+		Type: TokenSSLSmartstring,
 	}
 
 	meaningToken := meaning.getNextMeaningToken(iter)

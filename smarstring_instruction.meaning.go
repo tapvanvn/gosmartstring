@@ -26,7 +26,7 @@ func (meaning *SmarstringInstructionMeaning) Prepare(proc *gotokenize.MeaningPro
 		if token == nil {
 			break
 		}
-		if token.Type == TokenSSLSmarstring {
+		if token.Type == TokenSSLSmartstring {
 			tmpStream.AddToken(meaning.buildSmarstring(token, context))
 		} else {
 			tmpStream.AddToken(*token)
