@@ -30,32 +30,30 @@ func (compiler *SSCompiler) Compile(stream *gotokenize.TokenStream, context *SSC
 }
 
 func (compiler *SSCompiler) CompileToken(token *gotokenize.Token, context *SSContext) error {
-	var err error = nil
 
 	switch token.Type {
 	case TokenSSInstructionLink:
-		err = compiler.compileLink(token, context)
+		return compiler.compileLink(token, context)
 	case TokenSSInstructionRemember:
-		err = compiler.compileRemember(token, context)
+		return compiler.compileRemember(token, context)
 	case TokenSSInstructionDo:
-		err = compiler.compileDo(token, context)
+		return compiler.compileDo(token, context)
 	case TokenSSInstructionPack:
-		err = compiler.compilePack(token, context)
+		return compiler.compilePack(token, context)
 	case TokenSSInstructionExport:
-		err = compiler.compileExport(token, context)
+		return compiler.compileExport(token, context)
 	case TokenSSInstructionIf:
-		err = compiler.compileIf(token, context)
+		return compiler.compileIf(token, context)
 	case TokenSSInstructionCase:
-		err = compiler.compileCase(token, context)
+		return compiler.compileCase(token, context)
 	case TokenSSInstructionCount:
-		err = compiler.compileCount(token, context)
+		return compiler.compileCount(token, context)
 	case TokenSSInstructionEach:
-		err = compiler.compileEach(token, context)
+		return compiler.compileEach(token, context)
 	default:
-		err = compiler.Compile(&token.Children, context)
+		return compiler.Compile(&token.Children, context)
 	}
 
-	return err
 }
 
 func (compiler *SSCompiler) compileLink(token *gotokenize.Token, context *SSContext) error {
