@@ -77,11 +77,6 @@ func (ctx *SSContext) RegisterObject(name string, object IObject) {
 		finalAddress = ctx.IssueAddress()
 		ctx.registryStack.Append(name, finalAddress)
 	}
-	if str, ok := object.(*SSString); ok {
-		fmt.Printf("[%d] registerObject %s type:string->\"%s\"\n", ctx.id, name, str.Value)
-	} else {
-		fmt.Printf("[%d] registerObject %s type:%s\n", ctx.id, name, object.GetType())
-	}
 
 	ctx.registries[finalAddress] = CreateObjectRegistry(object)
 }
@@ -135,11 +130,11 @@ func (ctx *SSContext) GetRegistry(name string) *ssregistry {
 	}
 
 	if registry, ok := ctx.registries[address]; ok {
-		fmt.Printf("get registry found :%s address:%s\n", name, address)
+
 		return &registry
 
 	} else if ctx.Parent != nil {
-		fmt.Printf("get registry give to parent :%s address:%s\n", name, address)
+
 		return ctx.Parent.GetRegistry(address)
 	}
 

@@ -235,7 +235,7 @@ func TestSSLInstructionJSON(t *testing.T) {
 	context.RegisterInterface("name", name)
 	context.RegisterInterface("names", names)
 	context.RegisterObject("str", gosmartstring.CreateString("stringvalue"))
-	content := "{{name.name}}"
+	content := "{{todo}}"
 	meaning := gosmartstring.CreateSSInstructionMeaning()
 	stream := gotokenize.CreateStream(0)
 	stream.Tokenize(content)
@@ -250,8 +250,9 @@ func TestSSLInstructionJSON(t *testing.T) {
 		}
 		compileStream.AddToken(*token)
 	}
-	compileStream.Debug(0, gosmartstring.SSNaming, nil)
+	compileStream.Debug(10, gosmartstring.SSNaming, nil)
 	//compileStream.Debug(0, nil)
+
 	compiler := gosmartstring.SSCompiler{}
 
 	compiler.Compile(&compileStream, context)
