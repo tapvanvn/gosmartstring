@@ -114,7 +114,12 @@ func (compiler *SSCompiler) compileDo(token *gotokenize.Token, context *SSContex
 			}
 		}
 	}
-	compiler.callRegistry(name, params, context)
+
+	if err := compiler.callRegistry(name, params, context); err != nil {
+
+		return err
+	}
+
 	context.StackResult(output.Type, output.Content, context.This)
 	if !context.remember {
 
@@ -203,7 +208,7 @@ func (compiler *SSCompiler) compileCount(token *gotokenize.Token, context *SSCon
 	return nil
 }
 
-func (compiler *SSCompiler) callRegistry(name string, params []IObject, context *SSContext) {
+func (compiler *SSCompiler) callRegistry(name string, params []IObject, context *SSContext) error {
 
 	var rs IObject = nil
 
@@ -219,6 +224,7 @@ func (compiler *SSCompiler) callRegistry(name string, params []IObject, context 
 			//TODO: report registry nil
 			fmt.Println("cannot reach registry " + name)
 			context.PrintDebug(0)
+			return errors.New("cannot reach registry " + name)
 
 		} else if registry.Function != nil {
 
@@ -234,4 +240,5 @@ func (compiler *SSCompiler) callRegistry(name string, params []IObject, context 
 		}
 	}
 	context.This = rs
+	return nil
 }
