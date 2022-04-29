@@ -179,33 +179,31 @@ func (compiler *SSCompiler) compileEach(token *gotokenize.Token, context *SSCont
 
 		return errors.New("instruction each error " + arrayName + " is not an array")
 	}
-	if len(array.Stack) > 0 {
-		addressStack := CreateAddressStack()
-		context.SetStackRegistry(&addressStack)
+	addressStack := CreateAddressStack()
+	context.SetStackRegistry(&addressStack)
 
-		offset := iter.Offset
+	offset := iter.Offset
+	for _, element := range array.Stack {
 
-		for _, element := range array.Stack {
+		context.RegisterObject(elementName, element)
 
-			context.RegisterObject(elementName, element)
+		iter.Seek(offset)
 
-			iter.Seek(offset)
-
-			for {
-				childToken := iter.Read()
-				if childToken == nil {
-					break
-				}
-				if err := compiler.CompileToken(childToken, context); err != nil {
-					//TODO: should we issue an error token instead ?
-					return err
-				}
+		for {
+			childToken := iter.Read()
+			if childToken == nil {
+				break
 			}
-			addressStack.Inc()
+			if err := compiler.CompileToken(childToken, context); err != nil {
+				//TODO: should we issue an error token instead ?
+				return err
+			}
 		}
-		context.SetStackRegistry(nil)
-		context.StackResult(output.Type, output.Content, &addressStack)
+		addressStack.Inc()
 	}
+	context.SetStackRegistry(nil)
+
+	context.StackResult(output.Type, output.Content, &addressStack)
 	return nil
 }
 

@@ -101,7 +101,7 @@ func (ctx *SSContext) DebugCurrentStack() {
 
 		for address, translate := range ctx.registryStack.Address[ctx.registryStack.offset] {
 
-			fmt.Println("stack", ctx.registryStack.offset, address, "->", translate)
+			fmt.Printf("stack offset:%d ori:%s-> trans:%s\n", ctx.registryStack.offset, address, translate)
 		}
 	} else {
 
@@ -155,7 +155,7 @@ func (ctx *SSContext) StackResult(addressType int, address string, result IObjec
 
 		ctx.RegisterObject(address, result)
 
-	} else {
+	} else if addressType != TokenSSRegistryIgnore {
 
 		fmt.Println("unknown address type", addressType)
 	}
