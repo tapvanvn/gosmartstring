@@ -15,11 +15,15 @@ type SSCompiler struct {
 }
 
 func (compiler *SSCompiler) Compile(stream *gotokenize.TokenStream, context *SSContext) error {
+
 	iter := stream.Iterator()
+
 	for {
 
 		token := iter.Read()
+
 		if token == nil {
+
 			break
 		}
 		if err := compiler.CompileToken(token, context); err != nil {
@@ -54,7 +58,6 @@ func (compiler *SSCompiler) CompileToken(token *gotokenize.Token, context *SSCon
 	default:
 		return compiler.Compile(&token.Children, context)
 	}
-
 }
 
 func (compiler *SSCompiler) compileLink(token *gotokenize.Token, context *SSContext) error {
@@ -106,8 +109,7 @@ func (compiler *SSCompiler) compileDo(token *gotokenize.Token, context *SSContex
 
 				params = append(params, param.Object)
 			} else {
-				fmt.Println("registry not found " + childToken.Content)
-				context.PrintDebug(0)
+
 				return errors.New("registry not found " + childToken.Content)
 			}
 		}
@@ -155,7 +157,10 @@ func (compiler *SSCompiler) compileCase(token *gotokenize.Token, context *SSCont
 }
 
 func (compiler *SSCompiler) compileEach(token *gotokenize.Token, context *SSContext) error {
-
+	//#0 - array name
+	//#1 - output address
+	//#2 - element name
+	//#... - content
 	arrayName := token.Content
 	iter := token.Children.Iterator()
 	output := iter.Read()
@@ -171,7 +176,7 @@ func (compiler *SSCompiler) compileEach(token *gotokenize.Token, context *SSCont
 	array, ok := arrayObject.Object.(*SSArray)
 
 	if !ok {
-		fmt.Println("instruction each error " + arrayName + " is not an array")
+
 		return errors.New("instruction each error " + arrayName + " is not an array")
 	}
 	addressStack := CreateAddressStack()
@@ -191,6 +196,7 @@ func (compiler *SSCompiler) compileEach(token *gotokenize.Token, context *SSCont
 				break
 			}
 			if err := compiler.CompileToken(childToken, context); err != nil {
+				//TODO: should we issue an error token instead ?
 				return err
 			}
 		}
@@ -219,8 +225,6 @@ func (compiler *SSCompiler) callRegistry(name string, params []IObject, context 
 
 		if registry == nil {
 			//TODO: report registry nil
-			fmt.Println("cannot reach registry " + name)
-			context.PrintDebug(0)
 			return errors.New("cannot reach registry " + name)
 
 		} else if registry.Function != nil {
@@ -233,7 +237,6 @@ func (compiler *SSCompiler) callRegistry(name string, params []IObject, context 
 
 		} else {
 
-			fmt.Println("registry call fail")
 			return errors.New("registry unknown: " + name)
 		}
 	}

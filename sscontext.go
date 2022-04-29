@@ -96,12 +96,15 @@ func (ctx *SSContext) RegisterInterface(name string, object interface{}) {
 }
 
 func (ctx *SSContext) DebugCurrentStack() {
+
 	if ctx.registryStack != nil {
+
 		for address, translate := range ctx.registryStack.Address[ctx.registryStack.offset] {
 
 			fmt.Println("stack", ctx.registryStack.offset, address, "->", translate)
 		}
 	} else {
+
 		fmt.Println("no stack binding")
 	}
 }
@@ -151,8 +154,11 @@ func (ctx *SSContext) StackResult(addressType int, address string, result IObjec
 	} else if addressType == TokenSSRegistry {
 
 		ctx.RegisterObject(address, result)
-	}
 
+	} else {
+
+		fmt.Println("unknown address type", addressType)
+	}
 }
 
 func (ctx *SSContext) SetStackRegistry(stack *SSAddressStack) {
