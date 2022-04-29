@@ -55,25 +55,7 @@ func CreateContext(runtime *SSRuntime) *SSContext {
 	return ctx
 }
 
-/*
-func (ctx *SSContext) CreateSubContext() *SSContext {
-
-	subContext := &SSContext{
-		id:         uuid.New(),
-		Level:      ctx.Level + 1,
-		Runtime:    ctx.Runtime,
-		Root:       ctx.Root,
-		Parent:     ctx,
-		This:       ctx.This,
-		HotLink:    ctx.HotLink,
-		registries: map[string]ssregistry{},
-	}
-	return subContext
-}
-*/
-
-func (ctx *SSContext) RegisterObject(name string, object IObject) {
-
+func (ctx *SSContext) Register(name string, resitry ssregistry) {
 	finalAddress := name
 
 	if ctx.registryStack != nil {
@@ -81,31 +63,26 @@ func (ctx *SSContext) RegisterObject(name string, object IObject) {
 		ctx.registryStack.Append(name, finalAddress)
 	}
 	fmt.Printf("res obj: %s name:%s final:%s\n", ctx.ID(), name, finalAddress)
-	ctx.registries[finalAddress] = CreateObjectRegistry(object)
+	ctx.registries[finalAddress] = resitry
+}
+
+func (ctx *SSContext) RegisterObject(name string, object IObject) {
+
+	ctx.Register(name, CreateObjectRegistry(object))
 }
 
 func (ctx *SSContext) RegisterInterface(name string, object interface{}) {
 
 	parseObject := ParseInterface(object)
 
-	finalAddress := name
-	if ctx.registryStack != nil {
-		finalAddress = ctx.IssueAddress()
-		ctx.registryStack.Append(name, finalAddress)
-	}
+	ctx.Register(name, CreateObjectRegistry(parseObject))
 
-	ctx.registries[finalAddress] = CreateObjectRegistry(parseObject)
 }
 
 func (ctx *SSContext) RegisterFunction(name string, sfunc IFunction) {
 
-	finalAddress := name
-	if ctx.registryStack != nil {
-		finalAddress = ctx.IssueAddress()
-		ctx.registryStack.Append(name, finalAddress)
-	}
+	ctx.Register(name, CreateFunctionRegistry(sfunc))
 
-	ctx.registries[finalAddress] = CreateFunctionRegistry(sfunc)
 }
 
 func (ctx *SSContext) IssueAddress() string {
@@ -127,7 +104,7 @@ func (ctx *SSContext) GetRegistry(name string) *ssregistry {
 
 	} else if ctx.Parent != nil {
 		fmt.Printf("getparent %s name:%s address:%s\n", ctx.ID(), name, address)
-		return ctx.Parent.GetRegistry(address)
+		return ctx.Parent.GetRegistry(name)
 	}
 
 	return ctx.Runtime.GetRegistry(address)
@@ -170,23 +147,22 @@ func (ctx *SSContext) BindingTo(context *SSContext) {
 }
 func (ctx *SSContext) DebugCurrentStack(level int) {
 
+	for i := 0; i <= level; i++ {
+		fmt.Print("|")
+		if i == 0 {
+			fmt.Printf("%s ", gotokenize.ColorContent("stk"))
+		}
+		fmt.Print(" ")
+	}
+	fmt.Println()
 	if ctx.registryStack != nil {
 
-		for i := 0; i <= level; i++ {
-			fmt.Print("|")
-			if i == 0 {
-				fmt.Printf("%s ", gotokenize.ColorContent("stk"))
-			}
-			fmt.Print(" ")
-		}
-		fmt.Println()
 		for address, translate := range ctx.registryStack.Address[ctx.registryStack.offset] {
 			for i := 0; i <= level; i++ {
 				fmt.Print("|")
 				if i == 0 {
 
 					fmt.Printf("%s ", gotokenize.ColorContent(strconv.Itoa(ctx.registryStack.offset)))
-
 				}
 				fmt.Print(" ")
 			}
@@ -196,7 +172,7 @@ func (ctx *SSContext) DebugCurrentStack(level int) {
 
 		for i := 0; i <= level; i++ {
 			fmt.Print("|")
-			fmt.Println(" ")
+			fmt.Print(" ")
 		}
 		fmt.Println("no stack binding ")
 	}
