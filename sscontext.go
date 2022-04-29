@@ -63,7 +63,7 @@ func (ctx *SSContext) Register(name string, resitry ssregistry) {
 		finalAddress = ctx.IssueAddress()
 		ctx.registryStack.Append(name, finalAddress)
 	}
-	fmt.Printf("res obj: %s name:%s final:%s\n", ctx.ID(), name, finalAddress)
+	//fmt.Printf("res obj: %s name:%s final:%s\n", ctx.ID(), name, finalAddress)
 	ctx.registries[finalAddress] = resitry
 }
 
@@ -100,11 +100,11 @@ func (ctx *SSContext) GetRegistry(name string) *ssregistry {
 	}
 
 	if registry, ok := ctx.registries[address]; ok {
-		fmt.Printf("get %s name:%s address:%s\n", ctx.ID(), name, address)
+		//fmt.Printf("get %s name:%s address:%s\n", ctx.ID(), name, address)
 		return &registry
 
 	} else if ctx.Parent != nil {
-		fmt.Printf("getparent %s name:%s address:%s\n", ctx.ID(), name, address)
+		//fmt.Printf("getparent %s name:%s address:%s\n", ctx.ID(), name, address)
 		return ctx.Parent.GetRegistry(name)
 	}
 
