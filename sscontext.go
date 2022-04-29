@@ -2,12 +2,14 @@ package gosmartstring
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/tapvanvn/gotokenize/v2"
 )
 
 var _context_id = 0
 
+//NOTE: translate address is effected on the current context not the base
 type SSContext struct {
 	id      int
 	Root    *SSContext
@@ -95,20 +97,6 @@ func (ctx *SSContext) RegisterInterface(name string, object interface{}) {
 	ctx.registries[finalAddress] = CreateObjectRegistry(parseObject)
 }
 
-func (ctx *SSContext) DebugCurrentStack() {
-
-	if ctx.registryStack != nil {
-
-		for address, translate := range ctx.registryStack.Address[ctx.registryStack.offset] {
-
-			fmt.Printf("stack offset:%d ori:%s-> trans:%s\n", ctx.registryStack.offset, address, translate)
-		}
-	} else {
-
-		fmt.Println("no stack binding")
-	}
-}
-
 func (ctx *SSContext) RegisterFunction(name string, sfunc IFunction) {
 
 	finalAddress := name
@@ -166,6 +154,7 @@ func (ctx *SSContext) SetStackRegistry(stack *SSAddressStack) {
 	ctx.registryStack = stack
 }
 
+//TODO: should we apply push, pop to ctx, so it can auto change to last environment.
 func (ctx *SSContext) BindingTo(context *SSContext) {
 	if context != ctx {
 		if context != nil {
@@ -179,7 +168,39 @@ func (ctx *SSContext) BindingTo(context *SSContext) {
 		}
 	}
 }
+func (ctx *SSContext) DebugCurrentStack(level int) {
 
+	if ctx.registryStack != nil {
+
+		for i := 0; i <= level; i++ {
+			fmt.Print("|")
+			if i == 0 {
+				fmt.Printf("%s ", gotokenize.ColorContent("stk"))
+			}
+			fmt.Print(" ")
+		}
+		fmt.Println()
+		for address, translate := range ctx.registryStack.Address[ctx.registryStack.offset] {
+			for i := 0; i <= level; i++ {
+				fmt.Print("|")
+				if i == 0 {
+
+					fmt.Printf("%s ", gotokenize.ColorContent(strconv.Itoa(ctx.registryStack.offset)))
+
+				}
+				fmt.Print(" ")
+			}
+			fmt.Printf("stack ori:%s-> trans:%s\n", address, translate)
+		}
+	} else {
+
+		for i := 0; i <= level; i++ {
+			fmt.Print("|")
+			fmt.Println(" ")
+		}
+		fmt.Println("no stack binding ")
+	}
+}
 func (ctx *SSContext) PrintDebug(level int) {
 
 	for i := 0; i <= level; i++ {
@@ -221,6 +242,7 @@ func (ctx *SSContext) PrintDebug(level int) {
 
 		fmt.Println()
 	}
+	ctx.DebugCurrentStack(level)
 	if ctx.Parent != nil {
 
 		ctx.Parent.PrintDebug(level + 1)
