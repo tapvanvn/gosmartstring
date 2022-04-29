@@ -8,6 +8,7 @@ import (
 )
 
 var _context_id = 0
+var _address_id = int64(0)
 
 //NOTE: translate address is effected on the current context not the base
 type SSContext struct {
@@ -19,11 +20,11 @@ type SSContext struct {
 	This    IObject
 
 	//not public
-	hotLink       bool
-	remember      bool
-	result        []IObject
-	registries    map[string]ssregistry
-	registryCount int
+	hotLink    bool
+	remember   bool
+	result     []IObject
+	registries map[string]ssregistry
+	//registryCount int
 	registryStack *SSAddressStack
 }
 
@@ -39,15 +40,15 @@ func (ctx *SSContext) ID() string {
 func CreateContext(runtime *SSRuntime) *SSContext {
 	_context_id++
 	ctx := &SSContext{
-		id:            _context_id,
-		Level:         0,
-		Parent:        nil,
-		Runtime:       runtime,
-		This:          nil,
-		hotLink:       false,
-		remember:      false,
-		registries:    map[string]ssregistry{},
-		registryCount: 0,
+		id:         _context_id,
+		Level:      0,
+		Parent:     nil,
+		Runtime:    runtime,
+		This:       nil,
+		hotLink:    false,
+		remember:   false,
+		registries: map[string]ssregistry{},
+		//registryCount: 0,
 		registryStack: nil,
 	}
 
@@ -86,8 +87,8 @@ func (ctx *SSContext) RegisterFunction(name string, sfunc IFunction) {
 }
 
 func (ctx *SSContext) IssueAddress() string {
-	ctx.registryCount++
-	return fmt.Sprintf("%d", ctx.registryCount)
+	_address_id++
+	return fmt.Sprintf("%d", _address_id)
 }
 
 func (ctx *SSContext) GetRegistry(name string) *ssregistry {
