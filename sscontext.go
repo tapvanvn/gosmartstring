@@ -3,6 +3,7 @@ package gosmartstring
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/tapvanvn/gotokenize/v2"
 )
@@ -26,6 +27,8 @@ type SSContext struct {
 	registries map[string]ssregistry
 	//registryCount int
 	registryStack *SSAddressStack
+	//
+	DebugLevel int
 }
 
 type ssResultInfo struct {
@@ -51,6 +54,9 @@ func CreateContext(runtime *SSRuntime) *SSContext {
 		//registryCount: 0,
 		registryStack: nil,
 	}
+	if runtime == nil {
+		ctx.Runtime = EmptyRuntime
+	}
 
 	ctx.Root = ctx
 	return ctx
@@ -63,7 +69,7 @@ func (ctx *SSContext) Register(name string, resitry ssregistry) {
 		finalAddress = ctx.IssueAddress()
 		ctx.registryStack.Append(name, finalAddress)
 	}
-	//fmt.Printf("res obj: %s name:%s final:%s\n", ctx.ID(), name, finalAddress)
+
 	ctx.registries[finalAddress] = resitry
 }
 
@@ -92,9 +98,10 @@ func (ctx *SSContext) IssueAddress() string {
 }
 
 func (ctx *SSContext) GetRegistry(name string) *ssregistry {
-	var address = name
+	var formattedName = strings.TrimSpace(name)
+	var address = formattedName
 	if ctx.registryStack != nil {
-		if translate, ok := ctx.registryStack.Get(name); ok {
+		if translate, ok := ctx.registryStack.Get(formattedName); ok {
 			address = translate
 		}
 	}
@@ -105,7 +112,7 @@ func (ctx *SSContext) GetRegistry(name string) *ssregistry {
 
 	} else if ctx.Parent != nil {
 		//fmt.Printf("getparent %s name:%s address:%s\n", ctx.ID(), name, address)
-		return ctx.Parent.GetRegistry(name)
+		return ctx.Parent.GetRegistry(formattedName)
 	}
 
 	return ctx.Runtime.GetRegistry(address)

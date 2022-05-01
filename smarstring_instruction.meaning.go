@@ -15,7 +15,9 @@ func CreateSSInstructionMeaning() SmarstringInstructionMeaning {
 	}
 }
 
-func (meaning *SmarstringInstructionMeaning) Prepare(proc *gotokenize.MeaningProcess, context *SSContext) {
+func (meaning *SmarstringInstructionMeaning) Prepare(proc *gotokenize.MeaningProcess) {
+
+	context := proc.Context.BindingData.(*SSContext)
 
 	meaning.AbstractMeaning.Prepare(proc)
 

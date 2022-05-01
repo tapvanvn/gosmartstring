@@ -104,6 +104,7 @@ func ParseJSONString(jsonString string) IObject {
 	}
 	return nil
 }
+
 func parseBlock(token *gotokenize.Token, object *SSJSON) {
 
 	iter := token.Children.Iterator()
@@ -121,6 +122,7 @@ func parseBlock(token *gotokenize.Token, object *SSJSON) {
 		}
 	}
 }
+
 func parsePair(token *gotokenize.Token, object *SSJSON) {
 
 	iter := token.Children.Iterator()
