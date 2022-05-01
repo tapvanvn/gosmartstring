@@ -18,6 +18,16 @@ type SSStringMap struct {
 	attributes map[string]IObject
 }
 
+func (obj *SSStringMap) Get(key string) IObject {
+	obj.Lock()
+	defer obj.Unlock()
+	if iobj, ok := obj.attributes[key]; ok {
+
+		return iobj
+	}
+	return nil
+}
+
 func (obj *SSStringMap) Set(key string, val IObject) {
 	obj.Lock()
 	defer obj.Unlock()

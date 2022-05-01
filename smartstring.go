@@ -139,3 +139,5 @@ func SSNaming(tokenType int) string {
 		return "unknown"
 	}
 }
+
+var EmptyParams []IObject = []IObject{}
