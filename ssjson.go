@@ -1,6 +1,8 @@
 package gosmartstring
 
 import (
+	"sync"
+
 	"github.com/tapvanvn/gotokenize/v2"
 	"github.com/tapvanvn/gotokenize/v2/json"
 
@@ -9,6 +11,7 @@ import (
 
 type SSJSON struct {
 	IObject
+	sync.Mutex
 	attributes map[string]IObject
 }
 
@@ -133,19 +136,24 @@ func parsePair(token *gotokenize.Token, object *SSJSON) {
 	if value.Type == json.TokenJSONString || value.Type == json.TokenJSONNumberString {
 
 		valueObject := CreateString(value.Children.ConcatStringContent())
-
+		object.Lock()
 		object.attributes[attribute] = valueObject
+		object.Unlock()
 
 	} else if value.Type == json.TokenJSONSquare {
 
 		valueArray := CreateSSArray()
 		parseArray(value, valueArray)
+		object.Lock()
 		object.attributes[attribute] = valueArray
+		object.Unlock()
 
 	} else if value.Type == json.TokenJSONBlock {
 
 		valueObject := CreateSSJSON("")
+		object.Lock()
 		object.attributes[attribute] = valueObject
+		object.Unlock()
 		parseBlock(value, valueObject)
 	}
 }
@@ -180,8 +188,9 @@ func parseArray(token *gotokenize.Token, object *SSArray) {
 	}
 }
 
-func (obj SSJSON) Call(context *SSContext, name string, params []IObject) IObject {
-
+func (obj *SSJSON) Call(context *SSContext, name string, params []IObject) IObject {
+	obj.Lock()
+	defer obj.Unlock()
 	if iobj, ok := obj.attributes[name]; ok {
 
 		return iobj
@@ -190,10 +199,10 @@ func (obj SSJSON) Call(context *SSContext, name string, params []IObject) IObjec
 	return obj.IObject.Call(context, name, params)
 }
 
-func (obj SSJSON) GetType() string {
+func (obj *SSJSON) GetType() string {
 	return "ssjson"
 }
 
-func (obj SSJSON) CanExport() bool {
+func (obj *SSJSON) CanExport() bool {
 	return false
 }
