@@ -42,7 +42,7 @@ func SSFuncTestDo(context *gosmartstring.SSContext, input gosmartstring.IObject,
 	return nil
 }
 func SSFuncTestEach(context *gosmartstring.SSContext, input gosmartstring.IObject, params []gosmartstring.IObject) gosmartstring.IObject {
-	fmt.Println("call SSFuncTestDo", len(params))
+	fmt.Println("call SSFuncTestEach", len(params))
 	if element := context.GetRegistry("element"); element != nil && element.Object != nil {
 		if sstring, ok := element.Object.(*gosmartstring.SSString); ok {
 			fmt.Println("element", sstring.Value)

@@ -200,6 +200,7 @@ func (compiler *SSCompiler) compileEach(token *gotokenize.Token, context *SSCont
 	context.SetStackRegistry(&addressStack)
 
 	offset := iter.Offset
+
 	for _, element := range array.Stack {
 
 		context.RegisterObject(elementName, element)
@@ -211,12 +212,15 @@ func (compiler *SSCompiler) compileEach(token *gotokenize.Token, context *SSCont
 			if childToken == nil {
 				break
 			}
+			//fmt.Println("compile:", SSNaming(childToken.Type))
 			if err := compiler.CompileToken(childToken, context); err != nil {
 				//TODO: should we issue an error token instead ?
+				fmt.Println("error", err.Error())
 				return err
 			}
 		}
 		addressStack.Inc()
+		context.This = nil //do not remember the child
 	}
 	context.SetStackRegistry(nil)
 
