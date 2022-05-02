@@ -64,8 +64,18 @@ func SSFPut(context *ss.SSContext, input ss.IObject, params []ss.IObject) ss.IOb
 			fmt.Println("call put param2")
 			formatedName := strings.TrimSpace(name.Value)
 			if formatedName != "" {
-				fmt.Println("put to ", formatedName)
-				context.RegisterObject(formatedName, input)
+				hotObject := context.HotObject()
+				if hotObject != nil {
+					hotContent := "unknown"
+					if str, ok := hotObject.(*ss.SSString); ok {
+						hotContent = str.Value
+					}
+					fmt.Printf("put %s to %s\n,", hotContent, formatedName)
+
+				} else {
+					fmt.Println("put nil to ", formatedName)
+				}
+				context.RegisterObject(formatedName, hotObject)
 			}
 		}
 	}

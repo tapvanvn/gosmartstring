@@ -62,11 +62,24 @@ func (compiler *SSCompiler) CompileToken(token *gotokenize.Token, context *SSCon
 
 func (compiler *SSCompiler) compileLink(token *gotokenize.Token, context *SSContext) error {
 
+	fmt.Println("hot link")
 	context.hotLink = true
+	context.hotObject = context.This //TODO: is this correct?
+
+	if context.hotObject != nil {
+		if str, ok := context.hotObject.(*SSString); ok {
+			fmt.Printf("[%d]hot=%s\n", context.id, str.Value)
+		} else {
+			fmt.Printf("[%d]hot=someobject\n", context.id)
+		}
+	} else {
+		fmt.Printf("[%d]hot=nil\n", context.id)
+	}
+
 	return nil
 }
 func (compiler *SSCompiler) compileRemember(token *gotokenize.Token, context *SSContext) error {
-
+	fmt.Println("remember")
 	context.remember = true
 	return nil
 }
@@ -123,11 +136,12 @@ func (compiler *SSCompiler) compileDo(token *gotokenize.Token, context *SSContex
 	}
 
 	context.StackResult(output.Type, output.Content, context.This)
-	if !context.remember {
+	//if !context.remember && !context.hotLink {
 
-		context.This = nil
-	}
-	context.remember = false
+	//	context.This = nil
+	//	fmt.Println("reset context.this 2")
+	//}
+	//context.remember = false
 	return nil
 }
 
@@ -141,11 +155,12 @@ func (compiler *SSCompiler) compileExport(token *gotokenize.Token, context *SSCo
 	}
 
 	context.StackResult(output.Type, output.Content, context.This)
-	if !context.remember {
+	//if !context.remember && !context.hotLink {
 
-		context.This = nil
-	}
-	context.remember = false
+	//	context.This = nil
+	//	fmt.Println("reset context.this")
+	//}
+	//context.remember = false
 	return nil
 }
 
@@ -214,7 +229,7 @@ func (compiler *SSCompiler) compileCount(token *gotokenize.Token, context *SSCon
 }
 
 func (compiler *SSCompiler) callRegistry(name string, params []IObject, context *SSContext) error {
-
+	fmt.Println("call reg:", name)
 	var rs IObject = nil
 
 	if !context.hotLink && context.This != nil {
@@ -242,5 +257,14 @@ func (compiler *SSCompiler) callRegistry(name string, params []IObject, context 
 		}
 	}
 	context.This = rs
+	if context.This != nil {
+		if str, ok := context.This.(*SSString); ok {
+			fmt.Printf("[%d]this=%s\n", context.id, str.Value)
+		} else {
+			fmt.Printf("[%d]this=someobject\n", context.id)
+		}
+	} else {
+		fmt.Printf("[%d]this=nil\n", context.id)
+	}
 	return nil
 }

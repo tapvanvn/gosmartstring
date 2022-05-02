@@ -22,6 +22,7 @@ type SSContext struct {
 
 	//not public
 	hotLink    bool
+	hotObject  IObject
 	remember   bool
 	result     []IObject
 	registries map[string]ssregistry
@@ -49,6 +50,7 @@ func CreateContext(runtime *SSRuntime) *SSContext {
 		Runtime:    runtime,
 		This:       nil,
 		hotLink:    false,
+		hotObject:  nil,
 		remember:   false,
 		registries: map[string]ssregistry{},
 		//registryCount: 0,
@@ -61,7 +63,9 @@ func CreateContext(runtime *SSRuntime) *SSContext {
 	ctx.Root = ctx
 	return ctx
 }
-
+func (ctx *SSContext) HotObject() IObject {
+	return ctx.hotObject
+}
 func (ctx *SSContext) Register(name string, resitry ssregistry) {
 	finalAddress := name
 
