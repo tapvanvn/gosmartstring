@@ -1,6 +1,8 @@
 package gosmartstring
 
 import (
+	"fmt"
+
 	"github.com/tapvanvn/gotokenize/v2"
 )
 
@@ -27,11 +29,11 @@ func (meaning *SmarstringRawMeaning) Prepare(proc *gotokenize.MeaningProcess) {
 
 	meaning.AbstractMeaning.Prepare(proc)
 
-	//fmt.Println("--0--")
-	//proc.Stream.Debug(0, SSNaming, &gotokenize.DebugOption{
-	//	ExtendTypeSize: 6,
-	//})
-	//fmt.Println("--end 0--")
+	fmt.Println("--0--")
+	proc.Stream.Debug(0, SSNaming, &gotokenize.DebugOption{
+		ExtendTypeSize: 6,
+	})
+	fmt.Println("--end 0--")
 
 	tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
 	meaning.IsSmartstringOnly = true
@@ -81,11 +83,11 @@ func (meaning *SmarstringRawMeaning) Prepare(proc *gotokenize.MeaningProcess) {
 	}
 	proc.SetStream(proc.Context.AncestorTokens, &tmpStream)
 
-	//fmt.Println("--0.1--")
-	//proc.Stream.Debug(0, SSNaming, &gotokenize.DebugOption{
-	//	ExtendTypeSize: 6,
-	//})
-	//fmt.Println("--end 0.1--")
+	fmt.Println("--0.1--")
+	proc.Stream.Debug(0, SSNaming, &gotokenize.DebugOption{
+		ExtendTypeSize: 6,
+	})
+	fmt.Println("--end 0.1--")
 }
 
 func (meaning *SmarstringRawMeaning) continueSmartString(iter *gotokenize.Iterator) gotokenize.Token {
