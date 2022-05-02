@@ -239,10 +239,6 @@ func (compiler *SSCompiler) callRegistry(name string, params []IObject, context 
 			} else {
 				rs = registry.Object.Call(context, name, params)
 			}
-
-		} else {
-
-			return errors.New(fmt.Sprintf("registry unknown:[%s]", name))
 		}
 	}
 	context.This = rs
