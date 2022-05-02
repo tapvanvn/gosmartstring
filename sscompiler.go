@@ -115,6 +115,8 @@ func (compiler *SSCompiler) compileDo(token *gotokenize.Token, context *SSContex
 		}
 	}
 
+	//fmt.Printf("do %s with params:%v\n", name, params)
+
 	if err := compiler.callRegistry(name, params, context); err != nil {
 
 		return err
@@ -231,13 +233,16 @@ func (compiler *SSCompiler) callRegistry(name string, params []IObject, context 
 
 			rs = registry.Function(context, context.This, params)
 
-		} else if registry.Object != nil && len(params) == 0 {
-
-			rs = registry.Object
+		} else if registry.Object != nil {
+			if len(params) == 0 {
+				rs = registry.Object
+			} else {
+				rs = registry.Object.Call(context, name, params)
+			}
 
 		} else {
 
-			return errors.New("registry unknown: " + name)
+			return errors.New(fmt.Sprintf("registry unknown:[%s]", name))
 		}
 	}
 	context.This = rs

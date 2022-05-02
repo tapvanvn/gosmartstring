@@ -2,18 +2,22 @@ package gosmartstring_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/tapvanvn/gosmartstring"
+	ss "github.com/tapvanvn/gosmartstring"
 	"github.com/tapvanvn/gotokenize/v2"
 )
 
 const (
-	contentSimple = `{{dic("x"), dic("y")+put(z)}}`
+	contentSimple  = `{{dic("x"), dic("y")}}`
+	contentSimple2 = `{{dic("x"), dic("y")+put("z")}}`
 )
 
 var (
 	compiler = gosmartstring.SSCompiler{}
+	runtime  = createRuntime()
 )
 
 func printUtf8(content string) {
@@ -51,11 +55,27 @@ func SSFuncTestEach(context *gosmartstring.SSContext, input gosmartstring.IObjec
 	}
 	return nil
 }
+func SSFPut(context *ss.SSContext, input ss.IObject, params []ss.IObject) ss.IObject {
+	fmt.Println("call put")
+	if len(params) == 1 {
+		fmt.Println("call put param")
+		if name, ok := params[0].(*ss.SSString); ok {
+			fmt.Println("call put param2")
+			formatedName := strings.TrimSpace(name.Value)
+			if formatedName != "" {
+				fmt.Println("put to ", formatedName)
+				context.RegisterObject(formatedName, input)
+			}
+		}
+	}
+	return input
+}
 
 func createRuntime() *gosmartstring.SSRuntime {
 	runtime := gosmartstring.CreateRuntime(nil)
 	runtime.RegisterFunction("testDo", SSFuncTestDo)
 	runtime.RegisterFunction("testEach", SSFuncTestEach)
+	runtime.RegisterFunction("put", SSFPut)
 	return runtime
 }
 
@@ -279,16 +299,17 @@ func TestSSLInstructionJSON(t *testing.T) {
 
 func TestCompileSimple(t *testing.T) {
 
-	context := gosmartstring.CreateContext(nil)
+	context := gosmartstring.CreateContext(runtime)
+
 	dic := gosmartstring.CreateSSStringMap()
 	dic.Set("x", gosmartstring.CreateString("x_value"))
 	dic.Set("y", gosmartstring.CreateString("y_value"))
 	context.RegisterObject("dic", dic)
 
 	stream := gotokenize.CreateStream(0)
-	stream.Tokenize(contentSimple)
+	stream.Tokenize(contentSimple2)
 	proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &stream)
-	proc.Context.BindingData = gosmartstring.CreateContext(nil)
+	proc.Context.BindingData = context
 
 	meaning := gosmartstring.CreateSSInstructionMeaning()
 	meaning.Prepare(proc)
@@ -304,4 +325,9 @@ func TestCompileSimple(t *testing.T) {
 		context.PrintDebug(0)
 		t.Fatal(err)
 	}
+	fmt.Println("--final--")
+	compileStream.Debug(0, ss.SSNaming, &gotokenize.DebugOption{
+		ExtendTypeSize: 6,
+	})
+	fmt.Println("--end final--")
 }

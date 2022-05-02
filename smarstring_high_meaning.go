@@ -12,7 +12,9 @@ type SmarstringMeaning struct {
 func CreateSSMeaning() *SmarstringMeaning {
 	meaning := CreateSSRawMeaning()
 	return &SmarstringMeaning{
-		AbstractMeaning: gotokenize.NewAbtractMeaning(gotokenize.NewPatternMeaning(&meaning, SSLPatterns, SSLIgnores, SSLGlobalNested, gotokenize.NoTokens)),
+		AbstractMeaning: gotokenize.NewAbtractMeaning(
+			gotokenize.NewPatternMeaning(meaning, SSLPatterns, SSLIgnores, SSLGlobalNested, gotokenize.NoTokens),
+		),
 	}
 }
 
@@ -20,7 +22,13 @@ func (meaning *SmarstringMeaning) Prepare(process *gotokenize.MeaningProcess) {
 
 	meaning.AbstractMeaning.Prepare(process)
 
-	tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
+	//fmt.Println("--1.0--")
+	//process.Stream.Debug(0, SSNaming, &gotokenize.DebugOption{
+	//	ExtendTypeSize: 6,
+	//})
+	//fmt.Println("--end 1.0--")
+
+	tmpStream := gotokenize.CreateStream(0)
 
 	var token = meaning.AbstractMeaning.Next(process)
 
@@ -56,16 +64,12 @@ func (meaning *SmarstringMeaning) parseInstruction(token *gotokenize.Token) goto
 
 	iter := token.Children.Iterator()
 
-	meaningToken := meaning.getNextInstruction(iter)
-
 	for {
+		meaningToken := meaning.getNextInstruction(iter)
 		if meaningToken == nil {
 			break
 		}
-
 		newToken.Children.AddToken(*meaningToken)
-
-		meaningToken = meaning.getNextInstruction(iter)
 	}
 
 	return newToken
@@ -79,7 +83,7 @@ func (meaning *SmarstringMeaning) getNextInstruction(iter *gotokenize.Iterator) 
 			break
 		}
 
-		if token.Type == 0 || token.Type == TokenSSLCommand {
+		if token.Type == TokenSSLWord || token.Type == TokenSSLCommand {
 
 			instructionToken := &gotokenize.Token{
 
@@ -126,7 +130,7 @@ func (meaning *SmarstringMeaning) reachUntilEndInstruction(iter *gotokenize.Iter
 
 			break
 
-		} else if token.Type == 0 || token.Type == TokenSSLCommand {
+		} else if token.Type == TokenSSLWord || token.Type == TokenSSLCommand {
 
 			currentToken.Children.AddToken(meaning.parseInstruction(token))
 		}

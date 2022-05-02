@@ -6,6 +6,7 @@ var (
 	//MARK: smartstring
 	TokenSSLOperator = 1
 	TokenSSLString   = 2
+	TokenSSLWord     = 3
 
 	TokenSSLParenthese = 10
 	TokenSSLBlock      = 11
@@ -50,6 +51,7 @@ func SSInsructionMove(delta int) {
 	//MARK: smartstring
 	TokenSSLOperator += delta
 	TokenSSLString += delta
+	TokenSSLWord += delta
 
 	TokenSSLParenthese += delta
 	TokenSSLBlock += delta
@@ -86,7 +88,7 @@ var SSLPatterns = []gotokenize.Pattern{
 	{
 		Type: TokenSSLCommand,
 		Struct: []gotokenize.PatternToken{
-			{Type: 0},
+			{Type: TokenSSLWord},
 			{Type: TokenSSLParenthese, CanNested: true},
 		},
 		IsRemoveGlobalIgnore: true,
@@ -99,6 +101,8 @@ func SSNaming(tokenType int) string {
 		return "ss_operator"
 	case TokenSSLString:
 		return "ss_string"
+	case TokenSSLWord:
+		return "ss_word"
 	case TokenSSLParenthese:
 		return "ss_parenthese"
 	case TokenSSLBlock:

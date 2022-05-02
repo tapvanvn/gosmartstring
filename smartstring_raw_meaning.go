@@ -11,13 +11,13 @@ type SmarstringRawMeaning struct {
 	IsSmartstringOnly bool
 }
 
-func CreateSSRawMeaning() SmarstringRawMeaning {
+func CreateSSRawMeaning() *SmarstringRawMeaning {
 
 	tokenMap := map[string]gotokenize.RawTokenDefine{
 		".(){}[]+-*/\\,\"'": {TokenType: TokenSSLOperator, Separate: true},
 	}
 	meaning := gotokenize.CreateRawMeaning(tokenMap, false)
-	return SmarstringRawMeaning{
+	return &SmarstringRawMeaning{
 		AbstractMeaning:   gotokenize.NewAbtractMeaning(meaning),
 		IsSmartstringOnly: false,
 	}
@@ -26,6 +26,13 @@ func CreateSSRawMeaning() SmarstringRawMeaning {
 func (meaning *SmarstringRawMeaning) Prepare(proc *gotokenize.MeaningProcess) {
 
 	meaning.AbstractMeaning.Prepare(proc)
+
+	//fmt.Println("--0--")
+	//proc.Stream.Debug(0, SSNaming, &gotokenize.DebugOption{
+	//	ExtendTypeSize: 6,
+	//})
+	//fmt.Println("--end 0--")
+
 	tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
 	meaning.IsSmartstringOnly = true
 
@@ -73,6 +80,12 @@ func (meaning *SmarstringRawMeaning) Prepare(proc *gotokenize.MeaningProcess) {
 		}
 	}
 	proc.SetStream(proc.Context.AncestorTokens, &tmpStream)
+
+	//fmt.Println("--0.1--")
+	//proc.Stream.Debug(0, SSNaming, &gotokenize.DebugOption{
+	//	ExtendTypeSize: 6,
+	//})
+	//fmt.Println("--end 0.1--")
 }
 
 func (meaning *SmarstringRawMeaning) continueSmartString(iter *gotokenize.Iterator) gotokenize.Token {
@@ -103,9 +116,13 @@ func (meaning *SmarstringRawMeaning) continueSmartString(iter *gotokenize.Iterat
 				token.Content = token2.Content
 			}
 		}
+		if token.Type == 0 && token.Content != "" {
+			token.Type = TokenSSLWord
+		}
 		_ = iter.Read()
-		rsToken.Children.AddToken(*token)
-
+		if token.Type != 0 || token.Content != "" {
+			rsToken.Children.AddToken(*token)
+		}
 	}
 	return rsToken
 }

@@ -8,7 +8,9 @@ type SSRuntime struct {
 var EmptyRuntime = CreateRuntime(nil)
 
 func CreateRuntime(extend interface{}) *SSRuntime {
+
 	return &SSRuntime{
+
 		registries: map[string]ssregistry{},
 		extend:     extend,
 	}
