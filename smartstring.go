@@ -36,6 +36,7 @@ var (
 var AllSSInstructions = []int{
 	TokenSSInstructionDo,
 	TokenSSInstructionLink,
+	TokenSSInstructionRemember,
 	TokenSSInstructionPack,
 	TokenSSInstructionExport,
 	TokenSSInstructionIf,
@@ -69,6 +70,7 @@ func SSInsructionMove(delta int) {
 
 	TokenSSInstructionDo += delta
 	TokenSSInstructionLink += delta
+	TokenSSInstructionRemember += delta
 	TokenSSInstructionPack += delta
 	TokenSSInstructionExport += delta
 	TokenSSInstructionIf += delta
@@ -125,6 +127,8 @@ func SSNaming(tokenType int) string {
 		return "ss_registry_global"
 	case TokenSSInstructionDo:
 		return "ss_do"
+	case TokenSSInstructionRemember:
+		return "ss_remember"
 	case TokenSSInstructionLink:
 		return "ss_link"
 	case TokenSSInstructionPack:
