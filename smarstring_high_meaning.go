@@ -50,6 +50,11 @@ func (meaning *SmarstringMeaning) Prepare(process *gotokenize.MeaningProcess) {
 		token = meaning.AbstractMeaning.Next(process)
 	}
 	process.SetStream(process.Context.AncestorTokens, &tmpStream)
+	fmt.Println("--1.1--")
+	process.Stream.Debug(0, SSNaming, &gotokenize.DebugOption{
+		ExtendTypeSize: 6,
+	})
+	fmt.Println("--end 1.1--")
 }
 
 func (meaning *SmarstringMeaning) parseInstruction(token *gotokenize.Token) gotokenize.Token {

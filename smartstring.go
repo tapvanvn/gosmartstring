@@ -78,6 +78,13 @@ func SSInsructionMove(delta int) {
 	TokenSSInstructionEach += delta
 	TokenSSInstructionCount += delta
 
+	for _, patt := range SSLPatterns {
+		for _, pattToken := range patt.Struct {
+			if pattToken.Type > 0 {
+				pattToken.Type += delta
+			}
+		}
+	}
 }
 
 var SSLGlobalNested = []int{
