@@ -12,9 +12,10 @@ type SmarstringInstructionMeaning struct {
 }
 
 func CreateSSInstructionMeaning() *SmarstringInstructionMeaning {
-	return &SmarstringInstructionMeaning{
+	meaning := &SmarstringInstructionMeaning{
 		AbstractMeaning: gotokenize.NewAbtractMeaning(CreateSSMeaning()),
 	}
+	return meaning
 }
 
 func (meaning *SmarstringInstructionMeaning) Prepare(proc *gotokenize.MeaningProcess) {

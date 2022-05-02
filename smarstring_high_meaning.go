@@ -11,10 +11,15 @@ type SmarstringMeaning struct {
 }
 
 func CreateSSMeaning() *SmarstringMeaning {
+	fmt.Printf("%v\n", buildSSLPatterns())
 	meaning := CreateSSRawMeaning()
 	return &SmarstringMeaning{
 		AbstractMeaning: gotokenize.NewAbtractMeaning(
-			gotokenize.NewPatternMeaning(meaning, SSLPatterns, SSLIgnores, SSLGlobalNested, gotokenize.NoTokens),
+			gotokenize.NewPatternMeaning(meaning,
+				buildSSLPatterns(),
+				SSLIgnores,
+				getSSLGlobalNested(),
+				gotokenize.NoTokens),
 		),
 	}
 }

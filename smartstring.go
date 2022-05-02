@@ -33,75 +33,59 @@ var (
 	TokenSSInstructionCount    = 308 //count to and do
 )
 
-var AllSSInstructions = []int{
-	TokenSSInstructionDo,
-	TokenSSInstructionLink,
-	TokenSSInstructionRemember,
-	TokenSSInstructionPack,
-	TokenSSInstructionExport,
-	TokenSSInstructionIf,
-	TokenSSInstructionCase,
-	TokenSSInstructionEach,
-	TokenSSInstructionCount,
+var SSLAllTokens = []*int{
+	&TokenSSLOperator,
+	&TokenSSLString,
+	&TokenSSLWord,
+	&TokenSSLParenthese,
+	&TokenSSLBlock,
+	&TokenSSLSquare,
+	&TokenSSLCommand,
+	&TokenSSLInstruction,
+	&TokenSSLSmartstring,
+	&TokenSSLNormalstring,
+	&TokenSSRegistryIgnore,
+	&TokenSSRegistry,
+	&TokenSSRegistryGlobal,
+	&TokenSSInstructionDo,
+	&TokenSSInstructionLink,
+	&TokenSSInstructionRemember,
+	&TokenSSInstructionPack,
+	&TokenSSInstructionExport,
+	&TokenSSInstructionIf,
+	&TokenSSInstructionCase,
+	&TokenSSInstructionEach,
+	&TokenSSInstructionCount,
 }
 
 var SSInstructionTokenMove int = 0
 
 func SSInsructionMove(delta int) {
 
-	//MARK: smartstring
-	TokenSSLOperator += delta
-	TokenSSLString += delta
-	TokenSSLWord += delta
-
-	TokenSSLParenthese += delta
-	TokenSSLBlock += delta
-	TokenSSLSquare += delta
-
-	TokenSSLCommand += delta
-	TokenSSLInstruction += delta
-	TokenSSLSmartstring += delta
-	TokenSSLNormalstring += delta
-
-	//MARK:
-	TokenSSRegistryIgnore += delta
-	TokenSSRegistry += delta
-	TokenSSRegistryGlobal += delta
-
-	TokenSSInstructionDo += delta
-	TokenSSInstructionLink += delta
-	TokenSSInstructionRemember += delta
-	TokenSSInstructionPack += delta
-	TokenSSInstructionExport += delta
-	TokenSSInstructionIf += delta
-	TokenSSInstructionCase += delta
-	TokenSSInstructionEach += delta
-	TokenSSInstructionCount += delta
-
-	for _, patt := range SSLPatterns {
-		for _, pattToken := range patt.Struct {
-			if pattToken.Type > 0 {
-				pattToken.Type += delta
-			}
-		}
+	for _, token := range SSLAllTokens {
+		*token += delta
 	}
 }
 
-var SSLGlobalNested = []int{
-	TokenSSLSmartstring,
-}
 var SSLIgnores = []int{}
 
-var SSLPatterns = []gotokenize.Pattern{
-	//pattern attribute "key"="value"
-	{
-		Type: TokenSSLCommand,
-		Struct: []gotokenize.PatternToken{
-			{Type: TokenSSLWord},
-			{Type: TokenSSLParenthese, CanNested: true},
+func getSSLGlobalNested() []int {
+	return []int{
+		TokenSSLSmartstring,
+	}
+}
+func buildSSLPatterns() []gotokenize.Pattern {
+	return []gotokenize.Pattern{
+
+		{
+			Type: TokenSSLCommand,
+			Struct: []gotokenize.PatternToken{
+				{Type: TokenSSLWord},
+				{Type: TokenSSLParenthese, CanNested: true},
+			},
+			IsRemoveGlobalIgnore: true,
 		},
-		IsRemoveGlobalIgnore: true,
-	},
+	}
 }
 
 func SSNaming(tokenType int) string {

@@ -300,6 +300,7 @@ func TestSSLInstructionJSON(t *testing.T) {
 
 func TestCompileSimple(t *testing.T) {
 
+	gosmartstring.SSInsructionMove(5000)
 	context := gosmartstring.CreateContext(runtime)
 	context.DebugLevel = 1
 
