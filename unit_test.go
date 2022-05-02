@@ -13,6 +13,7 @@ import (
 const (
 	contentSimple  = `{{dic("x"), dic("y")}}`
 	contentSimple2 = `{{dic("x"), dic("y")+put("z")}}`
+	contentSimple3 = `{{single+put("z")}}`
 )
 
 var (
@@ -306,9 +307,10 @@ func TestCompileSimple(t *testing.T) {
 	dic.Set("x", gosmartstring.CreateString("x_value"))
 	dic.Set("y", gosmartstring.CreateString("y_value"))
 	context.RegisterObject("dic", dic)
+	context.RegisterObject("single", gosmartstring.CreateString("single_value"))
 
 	stream := gotokenize.CreateStream(0)
-	stream.Tokenize(contentSimple2)
+	stream.Tokenize(contentSimple3)
 	proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &stream)
 	proc.Context.BindingData = context
 
@@ -330,5 +332,6 @@ func TestCompileSimple(t *testing.T) {
 	compileStream.Debug(0, ss.SSNaming, &gotokenize.DebugOption{
 		ExtendTypeSize: 6,
 	})
+	gotokenize.DebugMeaning(meaning)
 	fmt.Println("--end final--")
 }

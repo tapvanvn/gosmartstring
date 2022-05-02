@@ -285,3 +285,6 @@ func (meaning *SmarstringRawMeaning) continueReadString(iter *gotokenize.Iterato
 		}
 	}
 }
+func (meaning *SmarstringRawMeaning) GetName() string {
+	return "ss_raw"
+}

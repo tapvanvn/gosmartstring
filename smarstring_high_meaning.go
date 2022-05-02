@@ -139,3 +139,7 @@ func (meaning *SmarstringMeaning) reachUntilEndInstruction(iter *gotokenize.Iter
 
 	}
 }
+
+func (meaning *SmarstringMeaning) GetName() string {
+	return "ss_meaning"
+}

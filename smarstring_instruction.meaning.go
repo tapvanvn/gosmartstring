@@ -11,8 +11,8 @@ type SmarstringInstructionMeaning struct {
 	//SmarstringMeaning
 }
 
-func CreateSSInstructionMeaning() SmarstringInstructionMeaning {
-	return SmarstringInstructionMeaning{
+func CreateSSInstructionMeaning() *SmarstringInstructionMeaning {
+	return &SmarstringInstructionMeaning{
 		AbstractMeaning: gotokenize.NewAbtractMeaning(CreateSSMeaning()),
 	}
 }
@@ -213,4 +213,19 @@ func (meaning *SmarstringInstructionMeaning) buildCommand(token *gotokenize.Toke
 	packToken.Children.AddToken(doToken)
 
 	return cmdAddress
+}
+func (meaning *SmarstringInstructionMeaning) GetMeaningLevel() int {
+
+	return meaning.AbstractMeaning.GetMeaningLevel() + 1
+}
+
+func (meaning *SmarstringInstructionMeaning) Propagate(fn func(meaning gotokenize.IMeaning)) {
+
+	fn(meaning)
+
+	meaning.AbstractMeaning.Propagate(fn)
+}
+
+func (meaning *SmarstringInstructionMeaning) GetName() string {
+	return "ss_instruction_meaning"
 }
