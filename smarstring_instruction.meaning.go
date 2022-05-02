@@ -1,6 +1,8 @@
 package gosmartstring
 
 import (
+	"fmt"
+
 	"github.com/tapvanvn/gotokenize/v2"
 )
 
@@ -197,12 +199,14 @@ func (meaning *SmarstringInstructionMeaning) buildCommand(token *gotokenize.Toke
 
 		doToken.Children.AddToken(param)
 	}
-	//fmt.Println("--do--")
-	//doToken.Debug(0, SSNaming, &gotokenize.DebugOption{
-	//	ExtendTypeSize: 6,
-	//})
-	//context.PrintDebug(0)
-	//fmt.Println("--end do--")
+	if context.DebugLevel > 0 {
+		fmt.Println("--do--")
+		doToken.Debug(0, SSNaming, &gotokenize.DebugOption{
+			ExtendTypeSize: 6,
+		})
+		context.PrintDebug(0)
+		fmt.Println("--end do--")
+	}
 	packToken.Children.AddToken(gotokenize.Token{
 		Type: TokenSSInstructionRemember,
 	})

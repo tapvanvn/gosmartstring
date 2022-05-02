@@ -300,6 +300,7 @@ func TestSSLInstructionJSON(t *testing.T) {
 func TestCompileSimple(t *testing.T) {
 
 	context := gosmartstring.CreateContext(runtime)
+	context.DebugLevel = 1
 
 	dic := gosmartstring.CreateSSStringMap()
 	dic.Set("x", gosmartstring.CreateString("x_value"))
