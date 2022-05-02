@@ -1,8 +1,6 @@
 package gosmartstring
 
 import (
-	"fmt"
-
 	"github.com/tapvanvn/gotokenize/v2"
 )
 
@@ -11,7 +9,7 @@ type SmarstringMeaning struct {
 }
 
 func CreateSSMeaning() *SmarstringMeaning {
-	fmt.Printf("%v\n", buildSSLPatterns())
+
 	meaning := CreateSSRawMeaning()
 	return &SmarstringMeaning{
 		AbstractMeaning: gotokenize.NewAbtractMeaning(
@@ -28,11 +26,11 @@ func (meaning *SmarstringMeaning) Prepare(process *gotokenize.MeaningProcess) {
 
 	meaning.AbstractMeaning.Prepare(process)
 
-	fmt.Println("--1.0--")
-	process.Stream.Debug(0, SSNaming, &gotokenize.DebugOption{
-		ExtendTypeSize: 6,
-	})
-	fmt.Println("--end 1.0--")
+	// fmt.Println("--1.0--")
+	// process.Stream.Debug(0, SSNaming, &gotokenize.DebugOption{
+	// 	ExtendTypeSize: 6,
+	// })
+	// fmt.Println("--end 1.0--")
 
 	tmpStream := gotokenize.CreateStream(0)
 
@@ -55,11 +53,11 @@ func (meaning *SmarstringMeaning) Prepare(process *gotokenize.MeaningProcess) {
 		token = meaning.AbstractMeaning.Next(process)
 	}
 	process.SetStream(process.Context.AncestorTokens, &tmpStream)
-	fmt.Println("--1.1--")
-	process.Stream.Debug(0, SSNaming, &gotokenize.DebugOption{
-		ExtendTypeSize: 6,
-	})
-	fmt.Println("--end 1.1--")
+	// fmt.Println("--1.1--")
+	// process.Stream.Debug(0, SSNaming, &gotokenize.DebugOption{
+	// 	ExtendTypeSize: 6,
+	// })
+	// fmt.Println("--end 1.1--")
 }
 
 func (meaning *SmarstringMeaning) parseInstruction(token *gotokenize.Token) gotokenize.Token {

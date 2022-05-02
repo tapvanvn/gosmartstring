@@ -24,11 +24,11 @@ func (meaning *SmarstringInstructionMeaning) Prepare(proc *gotokenize.MeaningPro
 
 	meaning.AbstractMeaning.Prepare(proc)
 
-	fmt.Println("--1--")
-	proc.Stream.Debug(0, SSNaming, &gotokenize.DebugOption{
-		ExtendTypeSize: 6,
-	})
-	fmt.Println("--end 1--")
+	// fmt.Println("--1--")
+	// proc.Stream.Debug(0, SSNaming, &gotokenize.DebugOption{
+	// 	ExtendTypeSize: 6,
+	// })
+	// fmt.Println("--end 1--")
 
 	tmpStream := gotokenize.CreateStream(0)
 
@@ -48,11 +48,11 @@ func (meaning *SmarstringInstructionMeaning) Prepare(proc *gotokenize.MeaningPro
 
 //process smartstring
 func (meaning *SmarstringInstructionMeaning) buildSmarstring(token *gotokenize.Token, context *SSContext) gotokenize.Token {
-	fmt.Println("--build smartstring--")
-	token.Debug(0, SSNaming, &gotokenize.DebugOption{
-		ExtendTypeSize: 6,
-	})
-	fmt.Println("--end smartstring--")
+	// fmt.Println("--build smartstring--")
+	// token.Debug(0, SSNaming, &gotokenize.DebugOption{
+	// 	ExtendTypeSize: 6,
+	// })
+	// fmt.Println("--end smartstring--")
 	packToken := gotokenize.Token{
 		Type: TokenSSInstructionPack,
 	}

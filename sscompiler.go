@@ -79,7 +79,7 @@ func (compiler *SSCompiler) compileLink(token *gotokenize.Token, context *SSCont
 	return nil
 }
 func (compiler *SSCompiler) compileRemember(token *gotokenize.Token, context *SSContext) error {
-	fmt.Println("remember")
+	//fmt.Println("remember")
 	context.remember = true
 	return nil
 }
