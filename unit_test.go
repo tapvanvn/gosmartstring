@@ -57,24 +57,24 @@ func SSFuncTestEach(context *gosmartstring.SSContext, input gosmartstring.IObjec
 	return nil
 }
 func SSFPut(context *ss.SSContext, input ss.IObject, params []ss.IObject) ss.IObject {
-	fmt.Println("call put")
+	//fmt.Println("call put")
 	if len(params) == 1 {
-		fmt.Println("call put param")
+		//fmt.Println("call put param")
 		if name, ok := params[0].(*ss.SSString); ok {
-			fmt.Println("call put param2")
+			//fmt.Println("call put param2")
 			formatedName := strings.TrimSpace(name.Value)
 			if formatedName != "" {
 				hotObject := context.HotObject()
-				if hotObject != nil {
-					hotContent := "unknown"
-					if str, ok := hotObject.(*ss.SSString); ok {
-						hotContent = str.Value
-					}
-					fmt.Printf("put %s to %s\n,", hotContent, formatedName)
+				//if hotObject != nil {
+				//hotContent := "unknown"
+				//if str, ok := hotObject.(*ss.SSString); ok {
+				//	hotContent = str.Value
+				//}
+				//fmt.Printf("put %s to %s\n,", hotContent, formatedName)
 
-				} else {
-					fmt.Println("put nil to ", formatedName)
-				}
+				//} else {
+				//fmt.Println("put nil to ", formatedName)
+				//}
 				context.RegisterObject(formatedName, hotObject)
 			}
 		}
@@ -312,7 +312,7 @@ func TestCompileSimple(t *testing.T) {
 
 	gosmartstring.SSInsructionMove(5000)
 	context := gosmartstring.CreateContext(runtime)
-	context.DebugLevel = 1
+	//context.DebugLevel = 1
 
 	dic := gosmartstring.CreateSSStringMap()
 	dic.Set("x", gosmartstring.CreateString("x_value"))
