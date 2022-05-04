@@ -67,10 +67,13 @@ func CreateContext(runtime *SSRuntime) *SSContext {
 	return ctx
 }
 
-//ResetErr reset the err infomation in intent to start a new compile process
-func (ctx *SSContext) ResetErr() {
+//Reset reset the context infomation in intent to start a new compile process
+func (ctx *SSContext) Reset() {
 
 	ctx.err = nil
+	ctx.hotLink = false
+	ctx.hotObject = nil
+	ctx.This = nil
 }
 
 //HotObject return the current hot object
