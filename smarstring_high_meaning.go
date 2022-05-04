@@ -104,20 +104,28 @@ func (meaning *SmarstringMeaning) parseParentThese(parentToken *gotokenize.Token
 
 	iter := parentToken.Children.Iterator()
 	tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
-	pack := gotokenize.NewToken(meaning.GetMeaningLevel(), TokenSSInstructionPack, "")
+	pack := gotokenize.NewToken(meaning.GetMeaningLevel(), TokenSSLSmartstring, "")
 	for {
 		meaningToken := meaning.getNextInstruction(iter)
 		if meaningToken == nil {
 			break
 		}
 		if meaningToken.Content == "," {
-			tmpStream.AddToken(*pack)
-			pack = gotokenize.NewToken(meaning.GetMeaningLevel(), TokenSSInstructionPack, "")
+			if pack.Children.Length() == 1 {
+				tmpStream.AddToken(*pack.Children.GetTokenAt(0))
+			} else if pack.Children.Length() > 1 {
+				meaning.prepareStream(pack)
+				tmpStream.AddToken(*pack)
+			}
+			pack = gotokenize.NewToken(meaning.GetMeaningLevel(), TokenSSLSmartstring, "")
 			continue
 		}
 		pack.Children.AddToken(*meaningToken)
 	}
-	if pack.Children.Length() > 0 {
+	if pack.Children.Length() == 1 {
+		tmpStream.AddToken(*pack.Children.GetTokenAt(0))
+	} else if pack.Children.Length() > 1 {
+		meaning.prepareStream(pack)
 		tmpStream.AddToken(*pack)
 	}
 	parentToken.Children = tmpStream
