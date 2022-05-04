@@ -41,8 +41,10 @@ type ssResultInfo struct {
 }
 
 func (ctx *SSContext) ID() string {
+
 	return fmt.Sprint(ctx.id)
 }
+
 func CreateContext(runtime *SSRuntime) *SSContext {
 	_context_id++
 	ctx := &SSContext{

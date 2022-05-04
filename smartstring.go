@@ -72,6 +72,7 @@ var SSLIgnores = []int{}
 func getSSLGlobalNested() []int {
 	return []int{
 		TokenSSLSmartstring,
+		TokenSSLParenthese,
 	}
 }
 func buildSSLPatterns() []gotokenize.Pattern {

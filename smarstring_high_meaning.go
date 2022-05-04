@@ -1,6 +1,8 @@
 package gosmartstring
 
 import (
+	"fmt"
+
 	"github.com/tapvanvn/gotokenize/v2"
 )
 
@@ -26,38 +28,99 @@ func (meaning *SmarstringMeaning) Prepare(process *gotokenize.MeaningProcess) {
 
 	meaning.AbstractMeaning.Prepare(process)
 
-	// fmt.Println("--1.0--")
-	// process.Stream.Debug(0, SSNaming, &gotokenize.DebugOption{
-	// 	ExtendTypeSize: 6,
-	// })
-	// fmt.Println("--end 1.0--")
+	fmt.Println("--1.0--")
+	process.Stream.Debug(0, SSNaming, &gotokenize.DebugOption{
+		ExtendTypeSize: 6,
+	})
+	fmt.Println("--end 1.0--")
 
 	tmpStream := gotokenize.CreateStream(0)
 
-	var token = meaning.AbstractMeaning.Next(process)
-
 	for {
+		var token = meaning.AbstractMeaning.Next(process)
 		if token == nil {
 			break
 		}
 
-		if token.Type == TokenSSLSmartstring {
+		if token.Type == TokenSSLSmartstring || token.Type == TokenSSLParenthese {
 
 			tmpStream.AddToken(meaning.parseInstruction(token))
 
+		} else if gotokenize.IsContainToken(getSSLGlobalNested(), token.Type) {
+			meaning.prepareStream(token)
+			tmpStream.AddToken(*token)
+		} else if token.Type == TokenSSLCommand {
+			meaning.parseCommand(token)
+			tmpStream.AddToken(*token)
 		} else {
 
 			tmpStream.AddToken(*token)
 		}
-
-		token = meaning.AbstractMeaning.Next(process)
 	}
 	process.SetStream(process.Context.AncestorTokens, &tmpStream)
-	// fmt.Println("--1.1--")
-	// process.Stream.Debug(0, SSNaming, &gotokenize.DebugOption{
-	// 	ExtendTypeSize: 6,
-	// })
-	// fmt.Println("--end 1.1--")
+	fmt.Println("--1.1--")
+	process.Stream.Debug(0, SSNaming, &gotokenize.DebugOption{
+		ExtendTypeSize: 6,
+	})
+	fmt.Println("--end 1.1--")
+}
+func (meaning *SmarstringMeaning) parseCommand(parentToken *gotokenize.Token) {
+	//tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
+	//tmpStream.AddToken(*parentToken.Children.GetTokenAt(0))
+	second := parentToken.Children.GetTokenAt(1)
+	meaning.parseParentThese(second)
+
+	//parentToken.Children = tmpStream
+}
+
+func (meaning *SmarstringMeaning) prepareStream(parentToken *gotokenize.Token) {
+
+	tmpStream := gotokenize.CreateStream(0)
+	iter := parentToken.Children.Iterator()
+	for {
+		token := iter.Read()
+		if token == nil {
+			break
+		}
+
+		if token.Type == TokenSSLSmartstring || token.Type == TokenSSLParenthese {
+
+			tmpStream.AddToken(meaning.parseInstruction(token))
+
+		} else if gotokenize.IsContainToken(getSSLGlobalNested(), token.Type) {
+			meaning.prepareStream(token)
+			tmpStream.AddToken(*token)
+		} else if token.Type == TokenSSLCommand {
+			meaning.parseCommand(token)
+			tmpStream.AddToken(*token)
+		} else {
+			tmpStream.AddToken(*token)
+		}
+
+	}
+	parentToken.Children = tmpStream
+}
+func (meaning *SmarstringMeaning) parseParentThese(parentToken *gotokenize.Token) {
+
+	iter := parentToken.Children.Iterator()
+	tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
+	pack := gotokenize.NewToken(meaning.GetMeaningLevel(), TokenSSInstructionPack, "")
+	for {
+		meaningToken := meaning.getNextInstruction(iter)
+		if meaningToken == nil {
+			break
+		}
+		if meaningToken.Content == "," {
+			tmpStream.AddToken(*pack)
+			pack = gotokenize.NewToken(meaning.GetMeaningLevel(), TokenSSInstructionPack, "")
+			continue
+		}
+		pack.Children.AddToken(*meaningToken)
+	}
+	if pack.Children.Length() > 0 {
+		tmpStream.AddToken(*pack)
+	}
+	parentToken.Children = tmpStream
 }
 
 func (meaning *SmarstringMeaning) parseInstruction(token *gotokenize.Token) gotokenize.Token {
@@ -101,8 +164,9 @@ func (meaning *SmarstringMeaning) getNextInstruction(iter *gotokenize.Iterator) 
 
 			if token.Type == TokenSSLCommand {
 
-				//debugPrint("try to reach nested intructions")
-				instructionToken.Children.AddToken(meaning.parseInstruction(token))
+				//fmt.Println("try to reach nested intructions")
+				meaning.parseCommand(token)
+				instructionToken.Children.AddToken(*token)
 
 			} else {
 
@@ -113,7 +177,9 @@ func (meaning *SmarstringMeaning) getNextInstruction(iter *gotokenize.Iterator) 
 			return instructionToken
 
 		} else {
-
+			if gotokenize.IsContainToken(getSSLGlobalNested(), token.Type) {
+				meaning.prepareStream(token)
+			}
 			return token
 		}
 

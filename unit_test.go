@@ -12,7 +12,7 @@ import (
 
 const (
 	contentSimple  = `{{dic("x"), dic("y")}}`
-	contentSimple2 = `{{dic("x","y"), dic("y")+put("z")}}`
+	contentSimple2 = `{{dic("x",dic.y), dic("y")+put("z")}}`
 	contentSimple3 = `{{single+put("z")}}`
 	contentSimple4 = `{{dic.y+put("z")}}`
 )
