@@ -1,1 +1,2 @@
 - redesign the compiler and context architecture
+- design a method to export the error

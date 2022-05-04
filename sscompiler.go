@@ -28,6 +28,7 @@ func (compiler *SSCompiler) Compile(stream *gotokenize.TokenStream, context *SSC
 		}
 		if err := compiler.CompileToken(token, context); err != nil {
 			fmt.Println("compile error :", err.Error())
+			context.err = err
 			return err
 		}
 	}
@@ -39,8 +40,8 @@ func (compiler *SSCompiler) CompileToken(token *gotokenize.Token, context *SSCon
 	switch token.Type {
 	case TokenSSInstructionLink:
 		return compiler.compileLink(token, context)
-	case TokenSSInstructionRemember:
-		return compiler.compileRemember(token, context)
+	case TokenSSInstructionReload:
+		return compiler.compileReload(token, context)
 	case TokenSSInstructionDo:
 		return compiler.compileDo(token, context)
 	case TokenSSInstructionPack:
@@ -62,31 +63,18 @@ func (compiler *SSCompiler) CompileToken(token *gotokenize.Token, context *SSCon
 
 func (compiler *SSCompiler) compileLink(token *gotokenize.Token, context *SSContext) error {
 
-	//fmt.Println("hot link")
 	context.hotLink = true
-	context.hotObject = context.This //TODO: is this correct?
-
-	/*if context.hotObject != nil {
-		if str, ok := context.hotObject.(*SSString); ok {
-			fmt.Printf("[%d]hot=%s\n", context.id, str.Value)
-		} else {
-			fmt.Printf("[%d]hot=someobject\n", context.id)
-		}
-	} else {
-		fmt.Printf("[%d]hot=nil\n", context.id)
-	}*/
+	context.hotObject = context.This
 
 	return nil
 }
-func (compiler *SSCompiler) compileRemember(token *gotokenize.Token, context *SSContext) error {
-	//fmt.Println("remember")
+func (compiler *SSCompiler) compileReload(token *gotokenize.Token, context *SSContext) error {
+
 	context.remember = true
 	return nil
 }
 
 func (compiler *SSCompiler) compilePack(token *gotokenize.Token, context *SSContext) error {
-
-	//subContext := context.CreateSubContext()
 
 	if err := compiler.Compile(&token.Children, context); err != nil {
 

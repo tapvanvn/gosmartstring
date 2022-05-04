@@ -22,15 +22,15 @@ var (
 	TokenSSRegistry       = 201 //link to registry
 	TokenSSRegistryGlobal = 202 //set result registry address to global
 
-	TokenSSInstructionDo       = 300 //command to do
-	TokenSSInstructionLink     = 301 //link last instruction to be input of next instruction
-	TokenSSInstructionRemember = 302 //set remember flag to true
-	TokenSSInstructionPack     = 303 //each children is an instruction
-	TokenSSInstructionExport   = 304 //just export string
-	TokenSSInstructionIf       = 305 //if statement
-	TokenSSInstructionCase     = 306 //check in cases
-	TokenSSInstructionEach     = 307 //loop for each .. in .. and do
-	TokenSSInstructionCount    = 308 //count to and do
+	TokenSSInstructionDo     = 300 //command to do
+	TokenSSInstructionLink   = 301 //link last instruction to be input of next instruction
+	TokenSSInstructionReload = 302 //check if can reload last returned object. error if last returned object is nil
+	TokenSSInstructionPack   = 303 //each children is an instruction
+	TokenSSInstructionExport = 304 //just export string
+	TokenSSInstructionIf     = 305 //if statement
+	TokenSSInstructionCase   = 306 //check in cases
+	TokenSSInstructionEach   = 307 //loop for each .. in .. and do
+	TokenSSInstructionCount  = 308 //count to and do
 )
 
 var SSLAllTokens = []*int{
@@ -49,7 +49,7 @@ var SSLAllTokens = []*int{
 	&TokenSSRegistryGlobal,
 	&TokenSSInstructionDo,
 	&TokenSSInstructionLink,
-	&TokenSSInstructionRemember,
+	&TokenSSInstructionReload,
 	&TokenSSInstructionPack,
 	&TokenSSInstructionExport,
 	&TokenSSInstructionIf,
@@ -118,8 +118,8 @@ func SSNaming(tokenType int) string {
 		return "ss_registry_global"
 	case TokenSSInstructionDo:
 		return "ss_do"
-	case TokenSSInstructionRemember:
-		return "ss_remember"
+	case TokenSSInstructionReload:
+		return "ss_reload"
 	case TokenSSInstructionLink:
 		return "ss_link"
 	case TokenSSInstructionPack:

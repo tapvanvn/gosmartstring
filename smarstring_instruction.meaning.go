@@ -8,7 +8,6 @@ import (
 
 type SmarstringInstructionMeaning struct {
 	*gotokenize.AbstractMeaning
-	//SmarstringMeaning
 }
 
 func CreateSSInstructionMeaning() *SmarstringInstructionMeaning {
@@ -70,6 +69,10 @@ func (meaning *SmarstringInstructionMeaning) buildSmarstring(token *gotokenize.T
 			packToken.Children.AddToken(gotokenize.Token{
 				Type: TokenSSInstructionLink,
 			})
+		} else if insToken.Content == "." {
+			packToken.Children.AddToken(gotokenize.Token{
+				Type: TokenSSInstructionReload, //reload the last returned
+			})
 		}
 	}
 
@@ -93,15 +96,17 @@ func (meaning *SmarstringInstructionMeaning) packInstruction(token *gotokenize.T
 			packToken.Children.AddToken(gotokenize.Token{
 				Type: TokenSSInstructionLink,
 			})
+		} else if childToken.Content == "." {
+			packToken.Children.AddToken(gotokenize.Token{
+				Type: TokenSSInstructionReload, //reload the last returned
+			})
 		} else if childToken.Type == TokenSSLWord {
 			//fmt.Println("--build word--")
 			//childToken.Debug(0, SSNaming, &gotokenize.DebugOption{
 			//	ExtendTypeSize: 6,
 			//})
 			//fmt.Println("--end word--")
-			packToken.Children.AddToken(gotokenize.Token{
-				Type: TokenSSInstructionRemember,
-			})
+
 			doToken := gotokenize.Token{
 				Type:    TokenSSInstructionDo,
 				Content: childToken.Content,
@@ -208,9 +213,9 @@ func (meaning *SmarstringInstructionMeaning) buildCommand(token *gotokenize.Toke
 		context.PrintDebug(0)
 		fmt.Println("--end do--")
 	}
-	packToken.Children.AddToken(gotokenize.Token{
-		Type: TokenSSInstructionRemember,
-	})
+	//packToken.Children.AddToken(gotokenize.Token{
+	//	Type: TokenSSInstructionRemember,
+	//})
 	packToken.Children.AddToken(doToken)
 
 	return cmdAddress

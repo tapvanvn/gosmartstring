@@ -129,8 +129,8 @@ func (meaning *SmarstringMeaning) reachUntilEndInstruction(iter *gotokenize.Iter
 		}
 
 		token := iter.Get()
-
-		if token.Content == "," || token.Content == "+" {
+		//TODO: move to a array of allowed operator notation
+		if token.Content == "," || token.Content == "+" || token.Content == "." {
 
 			if token.Content == "," {
 

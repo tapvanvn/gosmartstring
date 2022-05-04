@@ -23,13 +23,15 @@ type SSContext struct {
 	//not public
 	hotLink    bool
 	hotObject  IObject
+	err        error
 	remember   bool
 	result     []IObject
 	registries map[string]ssregistry
 	//registryCount int
 	registryStack *SSAddressStack
 	//
-	DebugLevel int
+	DebugLevel       int
+	backupDebugLevel int
 }
 
 type ssResultInfo struct {
@@ -51,6 +53,7 @@ func CreateContext(runtime *SSRuntime) *SSContext {
 		This:       nil,
 		hotLink:    false,
 		hotObject:  nil,
+		err:        nil,
 		remember:   false,
 		registries: map[string]ssregistry{},
 		//registryCount: 0,
@@ -63,9 +66,19 @@ func CreateContext(runtime *SSRuntime) *SSContext {
 	ctx.Root = ctx
 	return ctx
 }
+
+//ResetErr reset the err infomation in intent to start a new compile process
+func (ctx *SSContext) ResetErr() {
+
+	ctx.err = nil
+}
+
+//HotObject return the current hot object
 func (ctx *SSContext) HotObject() IObject {
 	return ctx.hotObject
 }
+
+//Register add a register
 func (ctx *SSContext) Register(name string, resitry ssregistry) {
 	finalAddress := name
 
@@ -146,17 +159,23 @@ func (ctx *SSContext) SetStackRegistry(stack *SSAddressStack) {
 //TODO: should we apply push, pop to ctx, so it can auto change to last environment.
 func (ctx *SSContext) BindingTo(context *SSContext) {
 	if context != ctx {
+		ctx.backupDebugLevel = ctx.DebugLevel
 		if context != nil {
 			ctx.Root = context.Root
 			ctx.Parent = context
 			ctx.registryStack = context.registryStack
+			if context.DebugLevel > ctx.DebugLevel {
+				ctx.DebugLevel = context.DebugLevel
+			}
 		} else {
 			ctx.Root = nil
 			ctx.Parent = nil
 			ctx.registryStack = nil
+			ctx.DebugLevel = ctx.backupDebugLevel
 		}
 	}
 }
+
 func (ctx *SSContext) DebugCurrentStack(level int) {
 
 	for i := 0; i <= level; i++ {
