@@ -21,10 +21,10 @@ type SSContext struct {
 	This    IObject
 
 	//not public
-	hotLink    bool
-	hotObject  IObject
-	err        error
-	remember   bool
+	hotLink   bool
+	hotObject IObject
+	err       error
+
 	result     []IObject
 	registries map[string]ssregistry
 	//registryCount int
@@ -46,15 +46,15 @@ func (ctx *SSContext) ID() string {
 func CreateContext(runtime *SSRuntime) *SSContext {
 	_context_id++
 	ctx := &SSContext{
-		id:         _context_id,
-		Level:      0,
-		Parent:     nil,
-		Runtime:    runtime,
-		This:       nil,
-		hotLink:    false,
-		hotObject:  nil,
-		err:        nil,
-		remember:   false,
+		id:        _context_id,
+		Level:     0,
+		Parent:    nil,
+		Runtime:   runtime,
+		This:      nil,
+		hotLink:   false,
+		hotObject: nil,
+		err:       nil,
+
 		registries: map[string]ssregistry{},
 		//registryCount: 0,
 		registryStack: nil,

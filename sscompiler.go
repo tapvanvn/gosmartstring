@@ -70,7 +70,10 @@ func (compiler *SSCompiler) compileLink(token *gotokenize.Token, context *SSCont
 }
 func (compiler *SSCompiler) compileReload(token *gotokenize.Token, context *SSContext) error {
 
-	context.remember = true
+	if context.This == nil {
+
+		return errors.New("last object missing")
+	}
 	return nil
 }
 
