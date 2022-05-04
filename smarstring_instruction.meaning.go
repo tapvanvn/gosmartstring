@@ -165,7 +165,7 @@ func (meaning *SmarstringInstructionMeaning) buildCommand(token *gotokenize.Toke
 							Content: address,
 						})
 					}
-				} else {
+				} else if childToken2.Content != "," {
 					address := context.IssueAddress()
 					paramToken := gotokenize.Token{
 						Type:    TokenSSRegistry,
