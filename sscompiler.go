@@ -264,6 +264,8 @@ func (compiler *SSCompiler) callRegistry(name string, params []IObject, context 
 	}
 
 	context.This = rs
+	context.hotLink = false
+
 	/*if context.This != nil {
 		if str, ok := context.This.(*SSString); ok {
 			fmt.Printf("[%d]this=%s\n", context.id, str.Value)
