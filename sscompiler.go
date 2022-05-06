@@ -238,7 +238,7 @@ func (compiler *SSCompiler) callRegistry(name string, params []IObject, context 
 	//fmt.Println("call reg:", name)
 	var rs IObject = nil
 
-	if !context.hotLink && context.This != nil {
+	if context.This != nil {
 
 		rs = context.This.Call(context, name, params)
 
