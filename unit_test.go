@@ -12,7 +12,7 @@ import (
 
 const (
 	contentSimple   = `{{dic("x"), dic("y")}}`
-	contentNestedDo = `{{dic("x",dic.y), dic("y")+put("z")}}`
+	contentNestedDo = `{{print(dic.x , dic.y)}}`
 	contentSimple3  = `{{single+put("z")}}`
 	contentSimple4  = `{{dic.y+put("z")}}`
 )
@@ -38,6 +38,17 @@ func SSFuncTestDo(context *gosmartstring.SSContext, input gosmartstring.IObject,
 			id := sstring.Value
 
 			fmt.Println("id", id)
+		}
+	}
+	return nil
+}
+func SSFPrint(context *ss.SSContext, input ss.IObject, params []ss.IObject) ss.IObject {
+	fmt.Printf("call ssfprint %d\n", len(params))
+	for i, param := range params {
+		if str, ok := param.(*ss.SSString); ok {
+			fmt.Printf("ssfprint-%d: %s\n", i, str.Value)
+		} else {
+			fmt.Printf("ssfprint-%d: %s\n", i, str.GetType())
 		}
 	}
 	return nil
@@ -88,6 +99,7 @@ func createRuntime() *gosmartstring.SSRuntime {
 	runtime.RegisterFunction("testDo", SSFuncTestDo)
 	runtime.RegisterFunction("testEach", SSFuncTestEach)
 	runtime.RegisterFunction("put", SSFPut)
+	runtime.RegisterFunction("print", SSFPrint)
 	return runtime
 }
 
@@ -311,6 +323,7 @@ func TestSSLInstructionJSON(t *testing.T) {
 
 func TestCompileSimple(t *testing.T) {
 
+	content := contentSimple
 	gosmartstring.SSInsructionMove(5000)
 	context := gosmartstring.CreateContext(runtime)
 	//context.DebugLevel = 1
@@ -322,7 +335,7 @@ func TestCompileSimple(t *testing.T) {
 	context.RegisterObject("single", gosmartstring.CreateString("single_value"))
 
 	stream := gotokenize.CreateStream(0)
-	stream.Tokenize(contentNestedDo)
+	stream.Tokenize(content)
 	proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &stream)
 	proc.Context.BindingData = context
 

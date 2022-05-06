@@ -116,10 +116,18 @@ func (compiler *SSCompiler) compileDo(token *gotokenize.Token, context *SSContex
 
 				return errors.New("registry not found " + childToken.Content)
 			}
+		} else {
+
+			if err := compiler.CompileToken(childToken, context); err != nil {
+
+				return err
+			}
+
+			params = append(params, context.This)
 		}
 	}
 
-	//fmt.Printf("do %s with params:%v\n", name, params)
+	fmt.Printf("do %s with params:%v\n", name, params)
 
 	if err := compiler.callRegistry(name, params, context); err != nil {
 

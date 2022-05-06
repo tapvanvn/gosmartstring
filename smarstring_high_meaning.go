@@ -42,7 +42,7 @@ func (meaning *SmarstringMeaning) Prepare(process *gotokenize.MeaningProcess) {
 			break
 		}
 
-		if token.Type == TokenSSLSmartstring || token.Type == TokenSSLParenthese {
+		if token.Type == TokenSSLSmartstring {
 
 			tmpStream.AddToken(meaning.parseInstruction(token))
 
@@ -65,12 +65,20 @@ func (meaning *SmarstringMeaning) Prepare(process *gotokenize.MeaningProcess) {
 	fmt.Println("--end 1.1--")
 }
 func (meaning *SmarstringMeaning) parseCommand(parentToken *gotokenize.Token) {
-	//tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
-	//tmpStream.AddToken(*parentToken.Children.GetTokenAt(0))
+	tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
+	tmpStream.AddToken(*parentToken.Children.GetTokenAt(0))
 	second := parentToken.Children.GetTokenAt(1)
-	meaning.parseParentThese(second)
 
-	//parentToken.Children = tmpStream
+	meaning.parseParentThese(second)
+	childIter := second.Children.Iterator()
+	for {
+		childToken := childIter.Read()
+		if childToken == nil {
+			break
+		}
+		tmpStream.AddToken(*childToken)
+	}
+	parentToken.Children = tmpStream
 }
 
 func (meaning *SmarstringMeaning) prepareStream(parentToken *gotokenize.Token) {
@@ -83,7 +91,7 @@ func (meaning *SmarstringMeaning) prepareStream(parentToken *gotokenize.Token) {
 			break
 		}
 
-		if token.Type == TokenSSLSmartstring || token.Type == TokenSSLParenthese {
+		if token.Type == TokenSSLSmartstring {
 
 			tmpStream.AddToken(meaning.parseInstruction(token))
 
@@ -102,6 +110,8 @@ func (meaning *SmarstringMeaning) prepareStream(parentToken *gotokenize.Token) {
 }
 func (meaning *SmarstringMeaning) parseParentThese(parentToken *gotokenize.Token) {
 
+	parentToken.Debug(5, SSNaming, &gotokenize.DebugOption{ExtendTypeSize: 6})
+
 	iter := parentToken.Children.Iterator()
 	tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
 	pack := gotokenize.NewToken(meaning.GetMeaningLevel(), TokenSSLSmartstring, "")
@@ -111,6 +121,7 @@ func (meaning *SmarstringMeaning) parseParentThese(parentToken *gotokenize.Token
 			break
 		}
 		if meaningToken.Content == "," {
+			fmt.Println("detect comma")
 			if pack.Children.Length() == 1 {
 				tmpStream.AddToken(*pack.Children.GetTokenAt(0))
 			} else if pack.Children.Length() > 1 {
@@ -128,12 +139,13 @@ func (meaning *SmarstringMeaning) parseParentThese(parentToken *gotokenize.Token
 		meaning.prepareStream(pack)
 		tmpStream.AddToken(*pack)
 	}
+	tmpStream.Debug(10, SSNaming, &gotokenize.DebugOption{ExtendTypeSize: 6})
 	parentToken.Children = tmpStream
 }
 
 func (meaning *SmarstringMeaning) parseInstruction(token *gotokenize.Token) gotokenize.Token {
 
-	if token.Type != TokenSSLSmartstring && token.Type != TokenSSLParenthese {
+	if token.Type != TokenSSLSmartstring {
 
 		return *token
 	}
@@ -208,10 +220,10 @@ func (meaning *SmarstringMeaning) reachUntilEndInstruction(iter *gotokenize.Iter
 		//TODO: move to a array of allowed operator notation
 		if token.Content == "," || token.Content == "+" || token.Content == "." {
 
-			if token.Content == "," {
+			/*if token.Content == "," {
 
 				_ = iter.Read()
-			}
+			}*/
 
 			break
 
