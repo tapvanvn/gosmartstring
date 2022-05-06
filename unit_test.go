@@ -17,6 +17,7 @@ const (
 	contentSimple4   = `{{dic.y+put("z")}}`
 	contentMultiline = `{{print(dic.y, "ab", dic.x)
 		print("done")}}`
+	contentGlobalObject = `{{globalObj.get("a")}}`
 )
 
 var (
@@ -96,12 +97,27 @@ func SSFPut(context *ss.SSContext, input ss.IObject, params []ss.IObject) ss.IOb
 	return input
 }
 
+type globalObject struct {
+	ss.IObject
+}
+
+func (obj *globalObject) Call(context *ss.SSContext, name string, params []ss.IObject) ss.IObject {
+	fmt.Println("global call", name, len(params))
+	return obj.IObject.Call(context, name, params)
+}
+
+func createGlobalObject() *globalObject {
+	return &globalObject{
+		&ss.SSObject{},
+	}
+}
 func createRuntime() *gosmartstring.SSRuntime {
 	runtime := gosmartstring.CreateRuntime(nil)
 	runtime.RegisterFunction("testDo", SSFuncTestDo)
 	runtime.RegisterFunction("testEach", SSFuncTestEach)
 	runtime.RegisterFunction("put", SSFPut)
 	runtime.RegisterFunction("print", SSFPrint)
+	runtime.RegisterObject("globalObj", createGlobalObject())
 	return runtime
 }
 
@@ -325,7 +341,7 @@ func TestSSLInstructionJSON(t *testing.T) {
 
 func TestCompileSimple(t *testing.T) {
 
-	content := contentMultiline
+	content := contentGlobalObject
 	gosmartstring.SSInsructionMove(5000)
 	context := gosmartstring.CreateContext(runtime)
 
