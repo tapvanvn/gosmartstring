@@ -156,6 +156,7 @@ func (meaning *SmarstringInstructionMeaning) buildCommand(token *gotokenize.Toke
 				if childToken2 == nil {
 					break
 				}
+				fmt.Println("parenthese :", SSNaming(childToken2.Type))
 				if childToken2.Type == TokenSSLCommand {
 
 					address := meaning.buildCommand(childToken2, true, packToken, context)
@@ -165,6 +166,10 @@ func (meaning *SmarstringInstructionMeaning) buildCommand(token *gotokenize.Toke
 							Content: address,
 						})
 					}
+				} else if childToken2.Type == TokenSSLSmartstring {
+
+					postToken := meaning.buildSmarstring(childToken2, context)
+					params = append(params, postToken)
 
 				} else if childToken2.Content != "," {
 					address := context.IssueAddress()

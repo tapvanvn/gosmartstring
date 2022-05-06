@@ -185,7 +185,9 @@ func (meaning *SmarstringMeaning) getNextInstruction(iter *gotokenize.Iterator) 
 			return instructionToken
 
 		} else {
+
 			if gotokenize.IsContainToken(getSSLGlobalNested(), token.Type) {
+
 				meaning.prepareStream(token)
 			}
 			return token

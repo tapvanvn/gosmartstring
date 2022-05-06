@@ -200,7 +200,6 @@ func (meaning *SmarstringRawMeaning) getNextMeaningToken(iter *gotokenize.Iterat
 		}
 
 		return token
-
 	}
 	return nil
 }
