@@ -147,6 +147,7 @@ func (meaning *SmarstringInstructionMeaning) buildCommand(token *gotokenize.Toke
 		if childToken == nil {
 			break
 		}
+
 		if childToken.Type == TokenSSLParenthese {
 
 			childIter := childToken.Children.Iterator()
@@ -166,17 +167,10 @@ func (meaning *SmarstringInstructionMeaning) buildCommand(token *gotokenize.Toke
 							Content: address,
 						})
 					}
-					/*	} else if childToken2.Type == TokenSSLSmartstring {
+				} else if childToken2.Type == TokenSSLSmartstring {
 
-						postToken := meaning.buildSmarstring(childToken2, context)
-						postIter := postToken.Children.Iterator()
-						for {
-							paramToken := postIter.Read()
-							if paramToken == nil {
-								break
-							}
-							params = append(params, *paramToken)
-						}*/
+					postToken := meaning.buildSmarstring(childToken2, context)
+					params = append(params, postToken)
 
 				} else if childToken2.Content != "," {
 					address := context.IssueAddress()
@@ -226,9 +220,7 @@ func (meaning *SmarstringInstructionMeaning) buildCommand(token *gotokenize.Toke
 		context.PrintDebug(0)
 		fmt.Println("--end do--")
 	}
-	//packToken.Children.AddToken(gotokenize.Token{
-	//	Type: TokenSSInstructionRemember,
-	//})
+
 	packToken.Children.AddToken(doToken)
 
 	return cmdAddress

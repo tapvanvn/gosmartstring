@@ -116,18 +116,21 @@ func (compiler *SSCompiler) compileDo(token *gotokenize.Token, context *SSContex
 
 				return errors.New("registry not found " + childToken.Content)
 			}
-		} else {
 
+		} else {
+			//childToken.Debug(15, SSNaming, &gotokenize.DebugOption{ExtendTypeSize: 6})
+			backup := context.This
+			context.Reset()
 			if err := compiler.CompileToken(childToken, context); err != nil {
 
 				return err
 			}
-
 			params = append(params, context.This)
+			context.This = backup
 		}
 	}
 
-	fmt.Printf("do %s with params:%v\n", name, params)
+	//fmt.Printf("do [%s] with params:%d\n", name, len(params))
 
 	if err := compiler.callRegistry(name, params, context); err != nil {
 
@@ -259,6 +262,7 @@ func (compiler *SSCompiler) callRegistry(name string, params []IObject, context 
 			}
 		}
 	}
+
 	context.This = rs
 	/*if context.This != nil {
 		if str, ok := context.This.(*SSString); ok {
@@ -267,7 +271,7 @@ func (compiler *SSCompiler) callRegistry(name string, params []IObject, context 
 			fmt.Printf("[%d]this=someobject\n", context.id)
 		}
 	} else {
-		fmt.Printf("[%d]this=nil\n", context.id)
+		fmt.Printf("[%d]this=nil [%s]\n", context.id, name)
 	}*/
 	return nil
 }

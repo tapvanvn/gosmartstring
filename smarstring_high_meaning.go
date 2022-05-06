@@ -65,12 +65,12 @@ func (meaning *SmarstringMeaning) Prepare(process *gotokenize.MeaningProcess) {
 	fmt.Println("--end 1.1--")
 }
 func (meaning *SmarstringMeaning) parseCommand(parentToken *gotokenize.Token) {
-	tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
-	tmpStream.AddToken(*parentToken.Children.GetTokenAt(0))
+	//tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
+	//tmpStream.AddToken(*parentToken.Children.GetTokenAt(0))
 	second := parentToken.Children.GetTokenAt(1)
 
 	meaning.parseParentThese(second)
-	childIter := second.Children.Iterator()
+	/*childIter := second.Children.Iterator()
 	for {
 		childToken := childIter.Read()
 		if childToken == nil {
@@ -78,7 +78,7 @@ func (meaning *SmarstringMeaning) parseCommand(parentToken *gotokenize.Token) {
 		}
 		tmpStream.AddToken(*childToken)
 	}
-	parentToken.Children = tmpStream
+	parentToken.Children = tmpStream*/
 }
 
 func (meaning *SmarstringMeaning) prepareStream(parentToken *gotokenize.Token) {
@@ -110,8 +110,6 @@ func (meaning *SmarstringMeaning) prepareStream(parentToken *gotokenize.Token) {
 }
 func (meaning *SmarstringMeaning) parseParentThese(parentToken *gotokenize.Token) {
 
-	parentToken.Debug(5, SSNaming, &gotokenize.DebugOption{ExtendTypeSize: 6})
-
 	iter := parentToken.Children.Iterator()
 	tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
 	pack := gotokenize.NewToken(meaning.GetMeaningLevel(), TokenSSLSmartstring, "")
@@ -121,7 +119,7 @@ func (meaning *SmarstringMeaning) parseParentThese(parentToken *gotokenize.Token
 			break
 		}
 		if meaningToken.Content == "," {
-			fmt.Println("detect comma")
+
 			if pack.Children.Length() == 1 {
 				tmpStream.AddToken(*pack.Children.GetTokenAt(0))
 			} else if pack.Children.Length() > 1 {
@@ -139,8 +137,9 @@ func (meaning *SmarstringMeaning) parseParentThese(parentToken *gotokenize.Token
 		meaning.prepareStream(pack)
 		tmpStream.AddToken(*pack)
 	}
-	tmpStream.Debug(10, SSNaming, &gotokenize.DebugOption{ExtendTypeSize: 6})
+
 	parentToken.Children = tmpStream
+
 }
 
 func (meaning *SmarstringMeaning) parseInstruction(token *gotokenize.Token) gotokenize.Token {
@@ -196,7 +195,7 @@ func (meaning *SmarstringMeaning) getNextInstruction(iter *gotokenize.Iterator) 
 
 			return instructionToken
 
-		} else {
+		} else if token.Type != gotokenize.TokenSpace {
 
 			if gotokenize.IsContainToken(getSSLGlobalNested(), token.Type) {
 
