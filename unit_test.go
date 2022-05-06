@@ -11,10 +11,12 @@ import (
 )
 
 const (
-	contentSimple   = `{{dic("x"), dic("y")}}`
-	contentNestedDo = `{{print(dic.y , dic.x, dic.y)}}`
-	contentSimple3  = `{{single+put("z")}}`
-	contentSimple4  = `{{dic.y+put("z")}}`
+	contentSimple    = `{{dic("x"), dic("y")}}`
+	contentNestedDo  = `{{print(dic.y , dic.x, dic.y)}}`
+	contentSimple3   = `{{single+put("z")}}`
+	contentSimple4   = `{{dic.y+put("z")}}`
+	contentMultiline = `{{print(dic.y, "ab", dic.x)
+		print("done")}}`
 )
 
 var (
@@ -323,7 +325,7 @@ func TestSSLInstructionJSON(t *testing.T) {
 
 func TestCompileSimple(t *testing.T) {
 
-	content := contentNestedDo
+	content := contentMultiline
 	gosmartstring.SSInsructionMove(5000)
 	context := gosmartstring.CreateContext(runtime)
 
