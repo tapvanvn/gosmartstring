@@ -3,6 +3,7 @@ package gosmartstring
 import (
 	crypto_rand "crypto/rand"
 	"encoding/binary"
+	"fmt"
 	"math/rand"
 )
 
@@ -20,11 +21,11 @@ func CreateSSArray() *SSArray {
 
 //MARK: implement IObject
 
-func (obj SSArray) GetType() string {
+func (obj *SSArray) GetType() string {
 	return "ssarray"
 }
 
-func (obj SSArray) Call(context *SSContext, name string, params []IObject) IObject {
+func (obj *SSArray) Call(context *SSContext, name string, params []IObject) IObject {
 
 	if name == "add" {
 
@@ -54,4 +55,9 @@ func (obj *SSArray) random() IObject {
 	rand.Seed(int64(binary.LittleEndian.Uint64(b[:])))
 	offset := rand.Intn(size)
 	return obj.Stack[offset]
+}
+
+func (obj *SSArray) ToString() string {
+
+	return fmt.Sprintf("%v", obj.Stack)
 }

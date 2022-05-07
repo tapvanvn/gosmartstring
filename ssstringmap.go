@@ -36,9 +36,17 @@ func (obj *SSStringMap) Set(key string, val IObject) {
 }
 
 func (obj *SSStringMap) Call(context *SSContext, name string, params []IObject) IObject {
+	attr := name
+	if name == "get" {
+		if len(params) == 1 {
+			if str, ok := params[0].(*SSString); ok {
+				attr = str.Value
+			}
+		}
+	}
 	obj.Lock()
 	defer obj.Unlock()
-	if iobj, ok := obj.attributes[name]; ok {
+	if iobj, ok := obj.attributes[attr]; ok {
 
 		return iobj
 	}

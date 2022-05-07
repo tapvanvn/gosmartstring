@@ -11,6 +11,7 @@ type IObject interface {
 	GetExtendFunc() map[string]IFunction
 	Call(context *SSContext, name string, params []IObject) IObject
 	Extend(functionName string, sfunc IFunction)
+	ToString() string
 	PrintDebug(level int)
 }
 
@@ -21,29 +22,29 @@ type SSObject struct {
 
 //MARK: implement IObject
 
-func (obj SSObject) CanExport() bool {
+func (obj *SSObject) CanExport() bool {
 	return false
 }
 
-func (obj SSObject) Export(context *SSContext) []byte {
+func (obj *SSObject) Export(context *SSContext) []byte {
 	return nil
 }
 
-func (obj SSObject) GetType() string {
+func (obj *SSObject) GetType() string {
 	return "ssobject"
 }
 
-func (obj SSObject) GetExtendFunc() map[string]IFunction {
+func (obj *SSObject) GetExtendFunc() map[string]IFunction {
 
 	return obj.extendFunctions
 }
 
-func (obj SSObject) Extend(functionName string, sfunc IFunction) {
+func (obj *SSObject) Extend(functionName string, sfunc IFunction) {
 
 	obj.extendFunctions[functionName] = sfunc
 }
 
-func (obj SSObject) Call(context *SSContext, name string, params []IObject) IObject {
+func (obj *SSObject) Call(context *SSContext, name string, params []IObject) IObject {
 
 	if name == "json" {
 		if obj.CanExport() {
@@ -53,11 +54,16 @@ func (obj SSObject) Call(context *SSContext, name string, params []IObject) IObj
 	}
 	if sfunc, ok := obj.extendFunctions[name]; ok {
 
-		return sfunc(context, &obj, params)
+		return sfunc(context, obj, params)
 	}
 	return nil
 }
 
-func (obj SSObject) PrintDebug(level int) {
+func (obj *SSObject) PrintDebug(level int) {
 
+}
+
+func (obj *SSObject) ToString() string {
+
+	return ""
 }

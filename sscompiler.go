@@ -88,7 +88,7 @@ func (compiler *SSCompiler) compilePack(token *gotokenize.Token, context *SSCont
 
 func (compiler *SSCompiler) compileDo(token *gotokenize.Token, context *SSContext) error {
 
-	name := token.Content
+	name := token.Content //the name of modular will be called
 	iter := token.Children.Iterator()
 	output := iter.Read()
 
@@ -116,16 +116,18 @@ func (compiler *SSCompiler) compileDo(token *gotokenize.Token, context *SSContex
 
 				return errors.New("registry not found " + childToken.Content)
 			}
-
 		} else {
 			//childToken.Debug(15, SSNaming, &gotokenize.DebugOption{ExtendTypeSize: 6})
 			backup := context.This
 			context.Reset()
+
 			if err := compiler.CompileToken(childToken, context); err != nil {
 
 				return err
 			}
+
 			params = append(params, context.This)
+
 			context.This = backup
 		}
 	}
@@ -235,7 +237,7 @@ func (compiler *SSCompiler) compileCount(token *gotokenize.Token, context *SSCon
 }
 
 func (compiler *SSCompiler) callRegistry(name string, params []IObject, context *SSContext) error {
-	//fmt.Println("call reg:", name)
+	//fmt.Printf("call reg: %s, numarg:%d\n", name, len(params))
 	var rs IObject = nil
 
 	if !context.hotLink && context.This != nil {

@@ -17,17 +17,19 @@ func CreateSSInstructionMeaning() *SmarstringInstructionMeaning {
 	return meaning
 }
 
+/*
 func (meaning *SmarstringInstructionMeaning) Prepare(proc *gotokenize.MeaningProcess) {
 
 	context := proc.Context.BindingData.(*SSContext)
 
 	meaning.AbstractMeaning.Prepare(proc)
 
-	// fmt.Println("--1--")
-	// proc.Stream.Debug(0, SSNaming, &gotokenize.DebugOption{
-	// 	ExtendTypeSize: 6,
-	// })
-	// fmt.Println("--end 1--")
+	fmt.Println("--2--")
+	proc.Stream.Debug(0, SSNaming, &gotokenize.DebugOption{
+
+		ExtendTypeSize: 6,
+	})
+	fmt.Println("--end 2--")
 
 	tmpStream := gotokenize.CreateStream(0)
 
@@ -43,55 +45,74 @@ func (meaning *SmarstringInstructionMeaning) Prepare(proc *gotokenize.MeaningPro
 		}
 	}
 	proc.SetStream(proc.Context.AncestorTokens, &tmpStream)
+	fmt.Println("--2.1--")
+	proc.Stream.Debug(0, SSNaming, &gotokenize.DebugOption{
+		ExtendTypeSize: 6,
+	})
+	fmt.Println("--end 2.1--")
+}*/
+func (meaning *SmarstringInstructionMeaning) Next(proc *gotokenize.MeaningProcess) *gotokenize.Token {
+	token := meaning.getNextMeaningToken(proc)
+	return token
+}
+func (meaning *SmarstringInstructionMeaning) processChild(context *gotokenize.MeaningContext, parentToken *gotokenize.Token) {
+	proc := gotokenize.NewMeaningProcessFromStream(append(context.AncestorTokens, parentToken.Type), &parentToken.Children)
+
+	newStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
+
+	for {
+		token := meaning.Next(proc)
+
+		if token == nil {
+
+			break
+		}
+		newStream.AddToken(*token)
+	}
+	parentToken.Children = newStream
+}
+
+func (meaning *SmarstringInstructionMeaning) getNextMeaningToken(proc *gotokenize.MeaningProcess) *gotokenize.Token {
+	token := proc.Iter.Read()
+	if token != nil {
+		sscontext := proc.Context.BindingData.(*SSContext)
+		if token.Type == TokenSSLSmartstring {
+			meaning.buildSmarstring(token, sscontext)
+		}
+	}
+	return token
 }
 
 //process smartstring
-func (meaning *SmarstringInstructionMeaning) buildSmarstring(token *gotokenize.Token, context *SSContext) gotokenize.Token {
+func (meaning *SmarstringInstructionMeaning) buildSmarstring(token *gotokenize.Token, sscontext *SSContext) {
 	// fmt.Println("--build smartstring--")
 	// token.Debug(0, SSNaming, &gotokenize.DebugOption{
 	// 	ExtendTypeSize: 6,
 	// })
 	// fmt.Println("--end smartstring--")
+
 	packToken := gotokenize.Token{
+
 		Type: TokenSSInstructionPack,
 	}
 	iter := token.Children.Iterator()
 
 	for {
 
-		insToken := iter.Read()
-		if insToken == nil {
-			break
-		}
-		if insToken.Type == TokenSSLInstruction {
-			meaning.packInstruction(insToken, &packToken, context)
-		} else if insToken.Content == "+" {
-			packToken.Children.AddToken(gotokenize.Token{
-				Type: TokenSSInstructionLink,
-			})
-		} else if insToken.Content == "." {
-			packToken.Children.AddToken(gotokenize.Token{
-				Type: TokenSSInstructionReload, //reload the last returned
-			})
-		}
-	}
-
-	return packToken
-}
-
-//each instruction is a doToken, but we need determine the pre and post actions of the call
-func (meaning *SmarstringInstructionMeaning) packInstruction(token *gotokenize.Token, packToken *gotokenize.Token, context *SSContext) {
-	iter := token.Children.Iterator()
-	lastInstructionNum := packToken.Children.Length()
-
-	for {
 		childToken := iter.Read()
 		if childToken == nil {
 			break
 		}
+		if childToken.Type == TokenSSLWord {
 
-		if childToken.Type == TokenSSLCommand {
-			meaning.buildCommand(childToken, false, packToken, context)
+			meaning.buildDoInstruction(childToken, "", sscontext)
+			packToken.Children.AddToken(*childToken)
+
+		} else if childToken.Type == TokenSSLCommand {
+
+			meaning.buildCommand(childToken, "", sscontext)
+			packToken.Children.AddToken(*childToken)
+
 		} else if childToken.Content == "+" {
 			packToken.Children.AddToken(gotokenize.Token{
 				Type: TokenSSInstructionLink,
@@ -100,45 +121,63 @@ func (meaning *SmarstringInstructionMeaning) packInstruction(token *gotokenize.T
 			packToken.Children.AddToken(gotokenize.Token{
 				Type: TokenSSInstructionReload, //reload the last returned
 			})
-		} else if childToken.Type == TokenSSLWord {
-			//fmt.Println("--build word--")
-			//childToken.Debug(0, SSNaming, &gotokenize.DebugOption{
-			//	ExtendTypeSize: 6,
-			//})
-			//fmt.Println("--end word--")
-
-			doToken := gotokenize.Token{
-				Type:    TokenSSInstructionDo,
-				Content: childToken.Content,
-			}
-			doToken.Children.AddToken(gotokenize.Token{
-				Type:    TokenSSRegistryIgnore,
-				Content: context.IssueAddress(),
+		} else if childToken.Content == "*" {
+			packToken.Children.AddToken(gotokenize.Token{
+				Type: TokenSSInstructionReload,
 			})
-			packToken.Children.AddToken(doToken)
+			exportToken := gotokenize.Token{
+				Type:    TokenSSInstructionExport,
+				Content: "",
+			}
+
+			exportToken.Children.AddToken(gotokenize.Token{
+				Type:    TokenSSRegistry,
+				Content: sscontext.IssueAddress(),
+			})
+
+			packToken.Children.AddToken(exportToken)
+		} else {
+			// fmt.Println("--err token")
+			// childToken.Debug(0, SSNaming, &gotokenize.DebugOption{ExtendTypeSize: 6})
+			// fmt.Println("--end err token")
 		}
 	}
-	if packToken.Children.Length() > lastInstructionNum {
+
+	*token = packToken
+}
+
+//each instruction is a doToken, but we need determine the pre and post actions of the call
+func (meaning *SmarstringInstructionMeaning) buildDoInstruction(wordToken *gotokenize.Token, outputAddress string, sscontext *SSContext) {
+
+	wordToken.Type = TokenSSInstructionDo
+
+	wordToken.Children.AddToken(gotokenize.Token{
+		Type:    TokenSSRegistryIgnore,
+		Content: sscontext.IssueAddress(),
+	})
+
+	/*if outputAddress != "" {
 		//add and export here
 		exportToken := gotokenize.Token{
 			Type:    TokenSSInstructionExport,
 			Content: "",
 		}
+		outputAddress = sscontext.IssueAddress()
 		exportToken.Children.AddToken(gotokenize.Token{
 			Type:    TokenSSRegistry,
-			Content: context.IssueAddress(),
+			Content: outputAddress,
 		})
-		packToken.Children.AddToken(exportToken)
-	}
+		wordToken.Children.AddToken(exportToken)
+	}*/
 }
 
-func (meaning *SmarstringInstructionMeaning) buildCommand(token *gotokenize.Token, isParam bool, packToken *gotokenize.Token, context *SSContext) string {
+func (meaning *SmarstringInstructionMeaning) buildCommand(token *gotokenize.Token, outputAddress string, sscontext *SSContext) {
 
 	iter := token.Children.Iterator()
 
 	nameToken := iter.Read()
 	if nameToken == nil || nameToken.Content == "" {
-		return ""
+		return
 	}
 
 	params := []gotokenize.Token{}
@@ -150,6 +189,7 @@ func (meaning *SmarstringInstructionMeaning) buildCommand(token *gotokenize.Toke
 
 		if childToken.Type == TokenSSLParenthese {
 
+			//pack := gotokenize.NewToken(meaning.GetMeaningLevel(), TokenSSLSmartstring, "")
 			childIter := childToken.Children.Iterator()
 
 			for {
@@ -160,32 +200,44 @@ func (meaning *SmarstringInstructionMeaning) buildCommand(token *gotokenize.Toke
 
 				if childToken2.Type == TokenSSLCommand {
 
-					address := meaning.buildCommand(childToken2, true, packToken, context)
-					if address != "" {
-						params = append(params, gotokenize.Token{
-							Type:    TokenSSRegistry,
-							Content: address,
-						})
-					}
+					address := sscontext.IssueAddress()
+					meaning.buildCommand(childToken2, address, sscontext)
+
+					/*params = append(params, gotokenize.Token{
+						Type:    TokenSSRegistry,
+						Content: address,
+					})*/
+
+					params = append(params, *childToken2)
 				} else if childToken2.Type == TokenSSLSmartstring {
 
-					postToken := meaning.buildSmarstring(childToken2, context)
-					params = append(params, postToken)
+					meaning.buildSmarstring(childToken2, sscontext)
+					params = append(params, *childToken2)
 
-				} else if childToken2.Content != "," {
-					address := context.IssueAddress()
+				} else if childToken2.Type == TokenSSLWord {
+
+					address := sscontext.IssueAddress()
+					meaning.buildDoInstruction(childToken2, address, sscontext)
+					params = append(params, *childToken2)
+
+				} else if childToken2.Type == TokenSSLString {
+
+					address := sscontext.IssueAddress()
 					paramToken := gotokenize.Token{
 						Type:    TokenSSRegistry,
 						Content: address,
 					}
 					value := ""
 					if childToken2.Type == 0 {
+
 						value = childToken2.Content
+
 					} else if childToken2.Type == TokenSSLString {
+
 						value = childToken2.Children.ConcatStringContent()
 					}
 
-					context.RegisterObject(address, CreateString(value))
+					sscontext.RegisterObject(address, CreateString(value))
 
 					params = append(params, paramToken)
 				}
@@ -194,37 +246,35 @@ func (meaning *SmarstringInstructionMeaning) buildCommand(token *gotokenize.Toke
 	}
 
 	addressType := TokenSSRegistryIgnore
-	if isParam {
+	cmdAddress := ""
+	/*if outputAddress != "" {
 
 		addressType = TokenSSRegistry
-	}
-
-	cmdAddress := context.IssueAddress()
-	doToken := gotokenize.Token{
+		cmdAddress = sscontext.IssueAddress()
+	}*/
+	newToken := gotokenize.Token{
 		Type:    TokenSSInstructionDo,
 		Content: nameToken.Content,
 	}
-	doToken.Children.AddToken(gotokenize.Token{
+	newToken.Children.AddToken(gotokenize.Token{
 		Type:    addressType,
 		Content: cmdAddress,
 	})
 	for _, param := range params {
 
-		doToken.Children.AddToken(param)
+		newToken.Children.AddToken(param)
 	}
-	if context.DebugLevel > 0 {
+	if sscontext.DebugLevel > 0 {
 		fmt.Println("--do--")
-		doToken.Debug(0, SSNaming, &gotokenize.DebugOption{
+		newToken.Debug(0, SSNaming, &gotokenize.DebugOption{
 			ExtendTypeSize: 6,
 		})
-		context.PrintDebug(0)
+		sscontext.PrintDebug(0)
 		fmt.Println("--end do--")
 	}
-
-	packToken.Children.AddToken(doToken)
-
-	return cmdAddress
+	*token = newToken
 }
+
 func (meaning *SmarstringInstructionMeaning) GetMeaningLevel() int {
 
 	return meaning.AbstractMeaning.GetMeaningLevel() + 1

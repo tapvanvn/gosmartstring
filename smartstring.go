@@ -7,13 +7,13 @@ var (
 	TokenSSLOperator = 1
 	TokenSSLString   = 2
 	TokenSSLWord     = 3
+	TokenSSLBreak    = 4
 
 	TokenSSLParenthese = 10
 	TokenSSLBlock      = 11
 	TokenSSLSquare     = 12
 
 	TokenSSLCommand      = 100
-	TokenSSLInstruction  = 101
 	TokenSSLSmartstring  = 102
 	TokenSSLNormalstring = 103
 
@@ -37,11 +37,11 @@ var SSLAllTokens = []*int{
 	&TokenSSLOperator,
 	&TokenSSLString,
 	&TokenSSLWord,
+	&TokenSSLBreak,
 	&TokenSSLParenthese,
 	&TokenSSLBlock,
 	&TokenSSLSquare,
 	&TokenSSLCommand,
-	&TokenSSLInstruction,
 	&TokenSSLSmartstring,
 	&TokenSSLNormalstring,
 	&TokenSSRegistryIgnore,
@@ -75,6 +75,7 @@ func getSSLGlobalNested() []int {
 		TokenSSLParenthese,
 	}
 }
+
 func buildSSLPatterns() []gotokenize.Pattern {
 	return []gotokenize.Pattern{
 
@@ -97,6 +98,8 @@ func SSNaming(tokenType int) string {
 		return "ss_string"
 	case TokenSSLWord:
 		return "ss_word"
+	case TokenSSLBreak:
+		return "ss_break"
 	case TokenSSLParenthese:
 		return "ss_parenthese"
 	case TokenSSLBlock:
@@ -105,8 +108,6 @@ func SSNaming(tokenType int) string {
 		return "ss_square"
 	case TokenSSLCommand:
 		return "ss_command"
-	case TokenSSLInstruction:
-		return "ss_instruction"
 	case TokenSSLSmartstring:
 		return "ss_smartstring"
 	case TokenSSLNormalstring:

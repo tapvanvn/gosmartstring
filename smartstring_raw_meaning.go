@@ -14,9 +14,9 @@ type SmarstringRawMeaning struct {
 func CreateSSRawMeaning() *SmarstringRawMeaning {
 
 	tokenMap := map[string]gotokenize.RawTokenDefine{
-		".(){}[]+-*/\\,\"'": {TokenType: TokenSSLOperator, Separate: true},
-		" ":                 {TokenType: gotokenize.TokenSpace, Separate: true},
-		"\r\n":              {TokenType: gotokenize.TokenSpace, Separate: true},
+		"?:><!&^%@.(){}[]+-*/\\\"'": {TokenType: TokenSSLOperator, Separate: true},
+		" ":                         {TokenType: gotokenize.TokenSpace, Separate: true},
+		",\r\n":                     {TokenType: TokenSSLBreak, Separate: false},
 	}
 	meaning := gotokenize.CreateRawMeaning(tokenMap, false)
 	return &SmarstringRawMeaning{

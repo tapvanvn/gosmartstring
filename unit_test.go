@@ -10,15 +10,9 @@ import (
 	"github.com/tapvanvn/gotokenize/v2"
 )
 
-const (
-	contentSimple    = `{{dic("x"), dic("y")}}`
-	contentNestedDo  = `{{print(dic.y , dic.x, dic.y)}}`
-	contentSimple3   = `{{single+put("z")}}`
-	contentSimple4   = `{{dic.y+put("z")}}`
-	contentMultiline = `{{print(dic.y, "ab", dic.x)
-		print("done")}}`
-	contentGlobalObject = `{{globalObj.get("a")}}`
-)
+func init() {
+	gosmartstring.SSInsructionMove(5000)
+}
 
 var (
 	compiler = gosmartstring.SSCompiler{}
@@ -48,10 +42,13 @@ func SSFuncTestDo(context *gosmartstring.SSContext, input gosmartstring.IObject,
 func SSFPrint(context *ss.SSContext, input ss.IObject, params []ss.IObject) ss.IObject {
 	fmt.Printf("call ssfprint %d\n", len(params))
 	for i, param := range params {
+
 		if str, ok := param.(*ss.SSString); ok {
 			fmt.Printf("ssfprint-%d: %s\n", i, str.Value)
+		} else if param != nil {
+			fmt.Printf("ssfprint-%d: %s\n", i, param.GetType())
 		} else {
-			fmt.Printf("ssfprint-%d: %s\n", i, str.GetType())
+			fmt.Printf("ssfprint-%d: %s\n", i, "nil")
 		}
 	}
 	return nil
@@ -73,13 +70,14 @@ func SSFuncTestEach(context *gosmartstring.SSContext, input gosmartstring.IObjec
 }
 func SSFPut(context *ss.SSContext, input ss.IObject, params []ss.IObject) ss.IObject {
 	//fmt.Println("call put")
+	hotObject := context.HotObject()
 	if len(params) == 1 {
 		//fmt.Println("call put param")
 		if name, ok := params[0].(*ss.SSString); ok {
 			//fmt.Println("call put param2")
 			formatedName := strings.TrimSpace(name.Value)
 			if formatedName != "" {
-				hotObject := context.HotObject()
+
 				//if hotObject != nil {
 				//hotContent := "unknown"
 				//if str, ok := hotObject.(*ss.SSString); ok {
@@ -91,10 +89,11 @@ func SSFPut(context *ss.SSContext, input ss.IObject, params []ss.IObject) ss.IOb
 				//fmt.Println("put nil to ", formatedName)
 				//}
 				context.RegisterObject(formatedName, hotObject)
+
 			}
 		}
 	}
-	return input
+	return hotObject
 }
 
 type globalObject struct {
@@ -111,6 +110,7 @@ func createGlobalObject() *globalObject {
 		&ss.SSObject{},
 	}
 }
+
 func createRuntime() *gosmartstring.SSRuntime {
 	runtime := gosmartstring.CreateRuntime(nil)
 	runtime.RegisterFunction("testDo", SSFuncTestDo)
@@ -121,8 +121,131 @@ func createRuntime() *gosmartstring.SSRuntime {
 	return runtime
 }
 
+func createContext() *gosmartstring.SSContext {
+	context := gosmartstring.CreateContext(runtime)
+
+	dic := gosmartstring.CreateSSStringMap()
+	dic.Set("x", gosmartstring.CreateString("x_value"))
+	dic.Set("y", gosmartstring.CreateString("y_value"))
+	context.RegisterObject("dic", dic)
+	context.RegisterObject("single", gosmartstring.CreateString("single_value"))
+	return context
+}
+
+const (
+	contentSyntax1 = `{{dic("y")+put("r")}}`
+	contentSyntax2 = `{{dic.x+put("z")
+		print(z)}}`
+	contentSyntax3   = `{{print(dic.get("x"), dic.get("y"))}}`
+	contentSimple    = `{{dic("x"), dic("y")}}`
+	contentNestedDo  = `{{print(dic.y , dic.x, dic.y)}}`
+	contentSimple3   = `{{single+put("z")}}`
+	contentSimple4   = `{{dic.y+put("z")}}`
+	contentMultiline = `{{print(dic.y, "ab", dic.x)
+		print("done")}}`
+	contentGlobalObject = `{{globalObj.get("a")}}`
+	contentPut          = `{{dic.x+put("z")
+		print(z)}}`
+)
+
+func TestRawMeaning(t *testing.T) {
+
+	content := contentSyntax1
+	context := createContext()
+
+	stream := gotokenize.CreateStream(0)
+	stream.Tokenize(content)
+
+	proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &stream)
+	proc.Context.BindingData = context
+
+	meaning := gosmartstring.CreateSSRawMeaning()
+	meaning.Prepare(proc)
+	compileStream := gotokenize.CreateStream(0)
+	for {
+		token := meaning.Next(proc)
+		if token == nil {
+			break
+		}
+		compileStream.AddToken(*token)
+	}
+	if err := compiler.Compile(&compileStream, context); err != nil {
+		context.PrintDebug(0)
+		t.Fatal(err)
+	}
+	fmt.Println("--final--")
+	compileStream.Debug(0, ss.SSNaming, &gotokenize.DebugOption{
+		ExtendTypeSize: 6,
+	})
+	gotokenize.DebugMeaning(meaning)
+	fmt.Println("--end final--")
+}
+func TestPatternMeaning(t *testing.T) {
+
+	content := contentSyntax1
+	context := createContext()
+
+	stream := gotokenize.CreateStream(0)
+	stream.Tokenize(content)
+
+	proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &stream)
+	proc.Context.BindingData = context
+
+	meaning := gosmartstring.CreateSSPatternMeaning()
+	meaning.Prepare(proc)
+	compileStream := gotokenize.CreateStream(0)
+	for {
+		token := meaning.Next(proc)
+		if token == nil {
+			break
+		}
+		compileStream.AddToken(*token)
+	}
+	if err := compiler.Compile(&compileStream, context); err != nil {
+		context.PrintDebug(0)
+		t.Fatal(err)
+	}
+	fmt.Println("--final--")
+	compileStream.Debug(0, ss.SSNaming, &gotokenize.DebugOption{
+		ExtendTypeSize: 6,
+	})
+	gotokenize.DebugMeaning(meaning)
+	fmt.Println("--end final--")
+}
+func TestHighMeaning(t *testing.T) {
+
+	content := contentSyntax3
+	context := createContext()
+
+	stream := gotokenize.CreateStream(0)
+	stream.Tokenize(content)
+
+	proc := gotokenize.NewMeaningProcessFromStream(gotokenize.NoTokens, &stream)
+	proc.Context.BindingData = context
+
+	meaning := gosmartstring.CreateSSMeaning()
+	meaning.Prepare(proc)
+	compileStream := gotokenize.CreateStream(0)
+	for {
+		token := meaning.Next(proc)
+		if token == nil {
+			break
+		}
+		compileStream.AddToken(*token)
+	}
+	if err := compiler.Compile(&compileStream, context); err != nil {
+		context.PrintDebug(0)
+		t.Fatal(err)
+	}
+	fmt.Println("--final--")
+	compileStream.Debug(0, ss.SSNaming, &gotokenize.DebugOption{
+		ExtendTypeSize: 6,
+	})
+	gotokenize.DebugMeaning(meaning)
+	fmt.Println("--end final--")
+}
 func TestSSInstructionDo(t *testing.T) {
-	context := gosmartstring.CreateContext(createRuntime())
+	context := createContext()
 	stream := gotokenize.CreateStream(0)
 	instructionDo := gosmartstring.BuildDo("testDo",
 		[]gosmartstring.IObject{
@@ -341,8 +464,8 @@ func TestSSLInstructionJSON(t *testing.T) {
 
 func TestCompileSimple(t *testing.T) {
 
-	content := contentGlobalObject
-	gosmartstring.SSInsructionMove(5000)
+	content := contentSyntax3
+
 	context := gosmartstring.CreateContext(runtime)
 
 	dic := gosmartstring.CreateSSStringMap()
