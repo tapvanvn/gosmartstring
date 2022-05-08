@@ -31,6 +31,7 @@ var (
 	TokenSSInstructionCase   = 306 //check in cases
 	TokenSSInstructionEach   = 307 //loop for each .. in .. and do
 	TokenSSInstructionCount  = 308 //count to and do
+	TokenSSInstructionReset  = 309 //reset this
 )
 
 var SSLAllTokens = []*int{
@@ -56,6 +57,7 @@ var SSLAllTokens = []*int{
 	&TokenSSInstructionCase,
 	&TokenSSInstructionEach,
 	&TokenSSInstructionCount,
+	&TokenSSInstructionReset,
 }
 
 var SSInstructionTokenMove int = 0
@@ -136,6 +138,8 @@ func SSNaming(tokenType int) string {
 		return "ss_each"
 	case TokenSSInstructionCount:
 		return "ss_count"
+	case TokenSSInstructionReset:
+		return "ss_reset"
 	default:
 		return "unknown"
 	}

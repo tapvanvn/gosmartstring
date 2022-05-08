@@ -12,10 +12,14 @@ type SSICompiler interface {
 }
 
 type SSCompiler struct {
+	lastRegistryCall string
 }
 
 func (compiler *SSCompiler) Compile(stream *gotokenize.TokenStream, context *SSContext) error {
 
+	fmt.Println("---compile--")
+	stream.Debug(0, SSNaming, &gotokenize.DebugOption{ExtendTypeSize: 6})
+	fmt.Println("---end compile--")
 	iter := stream.Iterator()
 
 	for {
@@ -29,6 +33,7 @@ func (compiler *SSCompiler) Compile(stream *gotokenize.TokenStream, context *SSC
 		if err := compiler.CompileToken(token, context); err != nil {
 			fmt.Println("compile error :", err.Error())
 			context.err = err
+
 			return err
 		}
 	}
@@ -56,6 +61,8 @@ func (compiler *SSCompiler) CompileToken(token *gotokenize.Token, context *SSCon
 		return compiler.compileCount(token, context)
 	case TokenSSInstructionEach:
 		return compiler.compileEach(token, context)
+	case TokenSSInstructionReset:
+		return compiler.compileReset(token, context)
 	default:
 		return compiler.Compile(&token.Children, context)
 	}
@@ -72,8 +79,13 @@ func (compiler *SSCompiler) compileReload(token *gotokenize.Token, context *SSCo
 
 	if context.This == nil {
 
-		return errors.New("last object missing")
+		return errors.New(fmt.Sprintf("last object missing: lastcall:[%s]", compiler.lastRegistryCall))
 	}
+	return nil
+}
+func (compiler *SSCompiler) compileReset(token *gotokenize.Token, context *SSContext) error {
+
+	context.This = nil
 	return nil
 }
 
@@ -237,11 +249,13 @@ func (compiler *SSCompiler) compileCount(token *gotokenize.Token, context *SSCon
 }
 
 func (compiler *SSCompiler) callRegistry(name string, params []IObject, context *SSContext) error {
+
 	//fmt.Printf("call reg: %s, numarg:%d\n", name, len(params))
+
 	var rs IObject = nil
 
 	if !context.hotLink && context.This != nil {
-
+		//fmt.Println("\tcall from last")
 		rs = context.This.Call(context, name, params)
 
 	} else {
@@ -277,5 +291,9 @@ func (compiler *SSCompiler) callRegistry(name string, params []IObject, context 
 	} else {
 		fmt.Printf("[%d]this=nil [%s]\n", context.id, name)
 	}*/
+	compiler.lastRegistryCall = name
+	if sserr, ok := context.This.(*SSError); ok {
+		return sserr
+	}
 	return nil
 }

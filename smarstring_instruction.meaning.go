@@ -85,11 +85,11 @@ func (meaning *SmarstringInstructionMeaning) getNextMeaningToken(proc *gotokeniz
 
 //process smartstring
 func (meaning *SmarstringInstructionMeaning) buildSmarstring(token *gotokenize.Token, sscontext *SSContext) {
-	// fmt.Println("--build smartstring--")
-	// token.Debug(0, SSNaming, &gotokenize.DebugOption{
-	// 	ExtendTypeSize: 6,
-	// })
-	// fmt.Println("--end smartstring--")
+	fmt.Println("--build smartstring--")
+	token.Debug(0, SSNaming, &gotokenize.DebugOption{
+		ExtendTypeSize: 6,
+	})
+	fmt.Println("--end smartstring--")
 
 	packToken := gotokenize.Token{
 
@@ -136,6 +136,10 @@ func (meaning *SmarstringInstructionMeaning) buildSmarstring(token *gotokenize.T
 			})
 
 			packToken.Children.AddToken(exportToken)
+		} else if childToken.Type == TokenSSLBreak {
+			packToken.Children.AddToken(gotokenize.Token{
+				Type: TokenSSInstructionReset,
+			})
 		} else {
 			// fmt.Println("--err token")
 			// childToken.Debug(0, SSNaming, &gotokenize.DebugOption{ExtendTypeSize: 6})
@@ -144,6 +148,13 @@ func (meaning *SmarstringInstructionMeaning) buildSmarstring(token *gotokenize.T
 	}
 
 	*token = packToken
+
+	// fmt.Println("--after build smartstring--")
+	// packToken.Debug(0, SSNaming, &gotokenize.DebugOption{
+	// 	ExtendTypeSize: 6,
+	// })
+	// fmt.Println("--end after  smartstring--")
+
 }
 
 //each instruction is a doToken, but we need determine the pre and post actions of the call
