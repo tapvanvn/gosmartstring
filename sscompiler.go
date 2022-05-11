@@ -17,9 +17,9 @@ type SSCompiler struct {
 
 func (compiler *SSCompiler) Compile(stream *gotokenize.TokenStream, context *SSContext) error {
 
-	fmt.Println("---compile--")
-	stream.Debug(0, SSNaming, &gotokenize.DebugOption{ExtendTypeSize: 6})
-	fmt.Println("---end compile--")
+	// fmt.Println("---compile--")
+	// stream.Debug(0, SSNaming, &gotokenize.DebugOption{ExtendTypeSize: 6})
+	// fmt.Println("---end compile--")
 	iter := stream.Iterator()
 
 	for {
@@ -32,9 +32,14 @@ func (compiler *SSCompiler) Compile(stream *gotokenize.TokenStream, context *SSC
 		}
 		if err := compiler.CompileToken(token, context); err != nil {
 			fmt.Println("compile error :", err.Error())
-			context.err = err
 
-			return err
+			if next := iter.Get(); next != nil && (next.Type != TokenSSInstructionQuestion || next.Type != TokenSSInstructionNegativeQuestion) {
+				context.err = err
+				return err
+			} else {
+
+				return nil
+			}
 		}
 	}
 	return nil
@@ -42,11 +47,18 @@ func (compiler *SSCompiler) Compile(stream *gotokenize.TokenStream, context *SSC
 
 func (compiler *SSCompiler) CompileToken(token *gotokenize.Token, context *SSContext) error {
 
+	if context.skipNext && token.Type != TokenSSInstructionReset {
+		return nil
+	}
 	switch token.Type {
 	case TokenSSInstructionLink:
 		return compiler.compileLink(token, context)
 	case TokenSSInstructionReload:
 		return compiler.compileReload(token, context)
+	case TokenSSInstructionQuestion:
+		return compiler.compileQuestion(token, context)
+	case TokenSSInstructionNegativeQuestion:
+		return compiler.compileQuestion(token, context)
 	case TokenSSInstructionDo:
 		return compiler.compileDo(token, context)
 	case TokenSSInstructionPack:
@@ -63,6 +75,8 @@ func (compiler *SSCompiler) CompileToken(token *gotokenize.Token, context *SSCon
 		return compiler.compileEach(token, context)
 	case TokenSSInstructionReset:
 		return compiler.compileReset(token, context)
+	case TokenSSInstructionBuildObject:
+		return compiler.compileBuildObject(token, context)
 	default:
 		return compiler.Compile(&token.Children, context)
 	}
@@ -86,15 +100,54 @@ func (compiler *SSCompiler) compileReload(token *gotokenize.Token, context *SSCo
 func (compiler *SSCompiler) compileReset(token *gotokenize.Token, context *SSContext) error {
 
 	context.This = nil
+	context.skipNext = false
+
 	return nil
 }
-
+func (compiler *SSCompiler) compileQuestion(token *gotokenize.Token, context *SSContext) error {
+	if token.Type == TokenSSInstructionNegativeQuestion {
+		if context.This != nil && !context.This.IsTrue() {
+			context.skipNext = true
+		}
+	} else {
+		if context.This == nil || context.This.IsTrue() {
+			context.skipNext = true
+		}
+	}
+	return nil
+}
 func (compiler *SSCompiler) compilePack(token *gotokenize.Token, context *SSContext) error {
 
 	if err := compiler.Compile(&token.Children, context); err != nil {
 
 		return err
 	}
+	return nil
+}
+func (compiler *SSCompiler) compileBuildObject(token *gotokenize.Token, context *SSContext) error {
+	obj := CreateSSStringMap()
+	pairIter := token.Children.Iterator()
+	for {
+		pairToken := pairIter.Read()
+		if pairToken == nil {
+			break
+		}
+		if pairToken.Type == TokenSSLPair {
+			valToken := pairToken.Children.GetTokenAt(0)
+			if valToken.Type == TokenSSLString {
+				obj.Set(pairToken.Content, CreateString(valToken.Children.ConcatStringContent()))
+			} else {
+				//meaning.buildSmarstring(valToken, sscontext)
+				//pack := NewSSInstructionPack(*childToken2)
+				context.Reset()
+				compiler.Compile(&valToken.Children, context)
+				obj.Set(pairToken.Content, context.This)
+			}
+		} else {
+			fmt.Printf("not pair:%s\n", SSNaming(pairToken.Type))
+		}
+	}
+	context.This = obj
 	return nil
 }
 
@@ -206,6 +259,9 @@ func (compiler *SSCompiler) compileEach(token *gotokenize.Token, context *SSCont
 	elementName := elementNameToken.Content
 
 	arrayObject := context.GetRegistry(arrayName)
+	if arrayObject == nil {
+		return errors.New("instruction each error " + arrayName + " is not an array")
+	}
 	array, ok := arrayObject.Object.(*SSArray)
 
 	if !ok {
@@ -271,11 +327,21 @@ func (compiler *SSCompiler) callRegistry(name string, params []IObject, context 
 			rs = registry.Function(context, context.This, params)
 
 		} else if registry.Object != nil {
+
 			if len(params) == 0 {
 				rs = registry.Object
 			} else {
 				rs = registry.Object.Call(context, name, params)
 			}
+
+		}
+	}
+	if rs != nil {
+
+		if pack, is := rs.(*SSIntructionPack); is {
+			//fmt.Println("---Instruction Pack---")
+			compiler.Compile(&pack.Pack.Children, context)
+			rs = context.This
 		}
 	}
 

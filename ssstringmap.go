@@ -1,6 +1,11 @@
 package gosmartstring
 
-import "sync"
+import (
+	"fmt"
+	"sync"
+
+	"github.com/tapvanvn/gotokenize/v2"
+)
 
 func CreateSSStringMap() *SSStringMap {
 
@@ -29,10 +34,10 @@ func (obj *SSStringMap) Get(key string) IObject {
 }
 
 func (obj *SSStringMap) Set(key string, val IObject) {
+	fmt.Println("set:", gotokenize.ColorRed(key), "value:", getObjectPresent(val))
 	obj.Lock()
 	defer obj.Unlock()
 	obj.attributes[key] = val
-
 }
 
 func (obj *SSStringMap) Call(context *SSContext, name string, params []IObject) IObject {
@@ -46,8 +51,16 @@ func (obj *SSStringMap) Call(context *SSContext, name string, params []IObject) 
 	}
 	obj.Lock()
 	defer obj.Unlock()
+
 	if iobj, ok := obj.attributes[attr]; ok {
 
+		if attr == "category_uuid" {
+			if iobj != nil {
+				fmt.Println("category _uuid", getObjectPresent(iobj))
+			} else {
+				fmt.Println("category _uuid nil")
+			}
+		}
 		return iobj
 	}
 
@@ -60,4 +73,28 @@ func (obj *SSStringMap) GetType() string {
 
 func (obj *SSStringMap) CanExport() bool {
 	return false
+}
+func getObjectPresent(obj IObject) string {
+	if obj != nil {
+		if str, ok := obj.(*SSString); ok {
+			return "[str]" + str.Value
+		} else {
+			return obj.GetType()
+		}
+	} else {
+		return "nil"
+	}
+}
+func (obj *SSStringMap) PrintDebug(level int) {
+
+	indent := "|"
+	for i := 1; i < level; i++ {
+		indent += " |"
+	}
+	fmt.Printf("%s%s\n", indent, gotokenize.ColorTeal("sstringmap"))
+	for key, val := range obj.attributes {
+
+		fmt.Printf("%s%s:%s\n", indent, gotokenize.ColorPurple(key), getObjectPresent(val))
+
+	}
 }

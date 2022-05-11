@@ -146,6 +146,8 @@ const (
 	contentGlobalObject = `{{globalObj.get("a")}}`
 	contentPut          = `{{dic.x+put("z")
 		print(z)}}`
+	contentSquare  = `{{print(["test":dic.x])}}`
+	contentSquare2 = `{{print(dic.x, ["test":dic.get("x")])}}`
 )
 
 func TestRawMeaning(t *testing.T) {
@@ -214,7 +216,7 @@ func TestPatternMeaning(t *testing.T) {
 }
 func TestHighMeaning(t *testing.T) {
 
-	content := contentSyntax3
+	content := contentSquare2
 	context := createContext()
 
 	stream := gotokenize.CreateStream(0)
@@ -464,7 +466,7 @@ func TestSSLInstructionJSON(t *testing.T) {
 
 func TestCompileSimple(t *testing.T) {
 
-	content := contentSyntax3
+	content := contentSquare2
 
 	context := gosmartstring.CreateContext(runtime)
 

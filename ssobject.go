@@ -11,6 +11,7 @@ type IObject interface {
 	GetExtendFunc() map[string]IFunction
 	Call(context *SSContext, name string, params []IObject) IObject
 	Extend(functionName string, sfunc IFunction)
+	IsTrue() bool
 	ToString() string
 	PrintDebug(level int)
 }
@@ -66,4 +67,7 @@ func (obj *SSObject) PrintDebug(level int) {
 func (obj *SSObject) ToString() string {
 
 	return ""
+}
+func (obj *SSObject) IsTrue() bool {
+	return obj != nil
 }

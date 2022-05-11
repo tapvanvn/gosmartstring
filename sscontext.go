@@ -23,6 +23,7 @@ type SSContext struct {
 	//not public
 	hotLink   bool
 	hotObject IObject
+	skipNext  bool
 	err       error
 
 	result     []IObject

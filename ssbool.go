@@ -12,17 +12,20 @@ func CreateBool(value bool) SSBool {
 	}
 }
 
-func (obj SSBool) CanExport() bool {
+func (obj *SSBool) CanExport() bool {
 	return true
 }
 
-func (obj SSBool) Export(context *SSContext) []byte {
+func (obj *SSBool) Export(context *SSContext) []byte {
 	if obj.Value {
 		return []byte("true")
 	}
 	return []byte("false")
 }
 
-func (obj SSBool) GetType() string {
+func (obj *SSBool) GetType() string {
 	return "ssbool"
+}
+func (obj *SSBool) IsTrue() bool {
+	return obj.Value
 }

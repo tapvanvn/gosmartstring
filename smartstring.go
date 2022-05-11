@@ -16,22 +16,26 @@ var (
 	TokenSSLCommand      = 100
 	TokenSSLSmartstring  = 102
 	TokenSSLNormalstring = 103
+	TokenSSLPair         = 104
 
 	//MARK:
 	TokenSSRegistryIgnore = 200 //dont care result
 	TokenSSRegistry       = 201 //link to registry
 	TokenSSRegistryGlobal = 202 //set result registry address to global
 
-	TokenSSInstructionDo     = 300 //command to do
-	TokenSSInstructionLink   = 301 //link last instruction to be input of next instruction
-	TokenSSInstructionReload = 302 //check if can reload last returned object. error if last returned object is nil
-	TokenSSInstructionPack   = 303 //each children is an instruction
-	TokenSSInstructionExport = 304 //just export string
-	TokenSSInstructionIf     = 305 //if statement
-	TokenSSInstructionCase   = 306 //check in cases
-	TokenSSInstructionEach   = 307 //loop for each .. in .. and do
-	TokenSSInstructionCount  = 308 //count to and do
-	TokenSSInstructionReset  = 309 //reset this
+	TokenSSInstructionDo               = 300 //command to do
+	TokenSSInstructionLink             = 301 //link last instruction to be input of next instruction
+	TokenSSInstructionReload           = 302 //check if can reload last returned object. error if last returned object is nil
+	TokenSSInstructionPack             = 303 //each children is an instruction
+	TokenSSInstructionExport           = 304 //just export string
+	TokenSSInstructionIf               = 305 //if statement
+	TokenSSInstructionCase             = 306 //check in cases
+	TokenSSInstructionEach             = 307 //loop for each .. in .. and do
+	TokenSSInstructionCount            = 308 //count to and do
+	TokenSSInstructionReset            = 309 //reset this
+	TokenSSInstructionQuestion         = 310 //question to skip
+	TokenSSInstructionNegativeQuestion = 311 //question (negative) to skip
+	TokenSSInstructionBuildObject      = 312
 )
 
 var SSLAllTokens = []*int{
@@ -45,6 +49,7 @@ var SSLAllTokens = []*int{
 	&TokenSSLCommand,
 	&TokenSSLSmartstring,
 	&TokenSSLNormalstring,
+	&TokenSSLPair,
 	&TokenSSRegistryIgnore,
 	&TokenSSRegistry,
 	&TokenSSRegistryGlobal,
@@ -58,6 +63,7 @@ var SSLAllTokens = []*int{
 	&TokenSSInstructionEach,
 	&TokenSSInstructionCount,
 	&TokenSSInstructionReset,
+	&TokenSSInstructionBuildObject,
 }
 
 var SSInstructionTokenMove int = 0
@@ -75,6 +81,7 @@ func getSSLGlobalNested() []int {
 	return []int{
 		TokenSSLSmartstring,
 		TokenSSLParenthese,
+		TokenSSLSquare,
 	}
 }
 
@@ -110,6 +117,8 @@ func SSNaming(tokenType int) string {
 		return "ss_square"
 	case TokenSSLCommand:
 		return "ss_command"
+	case TokenSSLPair:
+		return "pair"
 	case TokenSSLSmartstring:
 		return "ss_smartstring"
 	case TokenSSLNormalstring:

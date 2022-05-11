@@ -12,15 +12,18 @@ func CreateString(value string) *SSString {
 	}
 }
 
-func (obj SSString) CanExport() bool {
+func (obj *SSString) CanExport() bool {
 	return true
 }
 
-func (obj SSString) Export(context *SSContext) []byte {
+func (obj *SSString) Export(context *SSContext) []byte {
 
 	return []byte(obj.Value)
 }
 
-func (obj SSString) GetType() string {
+func (obj *SSString) GetType() string {
 	return "ssstring"
+}
+func (obj *SSString) IsTrue() bool {
+	return obj.Value != ""
 }

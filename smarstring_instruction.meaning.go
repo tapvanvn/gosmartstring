@@ -11,48 +11,20 @@ type SmarstringInstructionMeaning struct {
 }
 
 func CreateSSInstructionMeaning() *SmarstringInstructionMeaning {
+
 	meaning := &SmarstringInstructionMeaning{
+
 		AbstractMeaning: gotokenize.NewAbtractMeaning(CreateSSMeaning()),
 	}
 	return meaning
 }
 
-/*
-func (meaning *SmarstringInstructionMeaning) Prepare(proc *gotokenize.MeaningProcess) {
-
-	context := proc.Context.BindingData.(*SSContext)
-
-	meaning.AbstractMeaning.Prepare(proc)
-
-	fmt.Println("--2--")
-	proc.Stream.Debug(0, SSNaming, &gotokenize.DebugOption{
-
-		ExtendTypeSize: 6,
-	})
-	fmt.Println("--end 2--")
-
-	tmpStream := gotokenize.CreateStream(0)
-
-	for {
-		token := meaning.AbstractMeaning.Next(proc)
-		if token == nil {
-			break
-		}
-		if token.Type == TokenSSLSmartstring {
-			tmpStream.AddToken(meaning.buildSmarstring(token, context))
-		} else {
-			tmpStream.AddToken(*token)
-		}
-	}
-	proc.SetStream(proc.Context.AncestorTokens, &tmpStream)
-	fmt.Println("--2.1--")
-	proc.Stream.Debug(0, SSNaming, &gotokenize.DebugOption{
-		ExtendTypeSize: 6,
-	})
-	fmt.Println("--end 2.1--")
-}*/
 func (meaning *SmarstringInstructionMeaning) Next(proc *gotokenize.MeaningProcess) *gotokenize.Token {
 	token := meaning.getNextMeaningToken(proc)
+	if token != nil {
+		token.Debug(0, SSNaming, &gotokenize.DebugOption{ExtendTypeSize: 6})
+	}
+
 	return token
 }
 func (meaning *SmarstringInstructionMeaning) processChild(context *gotokenize.MeaningContext, parentToken *gotokenize.Token) {
@@ -85,11 +57,11 @@ func (meaning *SmarstringInstructionMeaning) getNextMeaningToken(proc *gotokeniz
 
 //process smartstring
 func (meaning *SmarstringInstructionMeaning) buildSmarstring(token *gotokenize.Token, sscontext *SSContext) {
-	fmt.Println("--build smartstring--")
-	token.Debug(0, SSNaming, &gotokenize.DebugOption{
-		ExtendTypeSize: 6,
-	})
-	fmt.Println("--end smartstring--")
+	// fmt.Println("--build smartstring--")
+	// token.Debug(0, SSNaming, &gotokenize.DebugOption{
+	// 	ExtendTypeSize: 6,
+	// })
+	// fmt.Println("--end smartstring--")
 
 	packToken := gotokenize.Token{
 
@@ -121,10 +93,27 @@ func (meaning *SmarstringInstructionMeaning) buildSmarstring(token *gotokenize.T
 			packToken.Children.AddToken(gotokenize.Token{
 				Type: TokenSSInstructionReload, //reload the last returned
 			})
+		} else if childToken.Content == "?" {
+			next := iter.Get()
+			if next != nil && next.Content == "!" {
+				_ = iter.Read()
+				packToken.Children.AddToken(gotokenize.Token{
+
+					Type: TokenSSInstructionNegativeQuestion, //check if last is true
+				})
+			} else {
+				packToken.Children.AddToken(gotokenize.Token{
+
+					Type: TokenSSInstructionQuestion, //check if last is true
+				})
+			}
+
 		} else if childToken.Content == "*" {
+
 			packToken.Children.AddToken(gotokenize.Token{
 				Type: TokenSSInstructionReload,
 			})
+
 			exportToken := gotokenize.Token{
 				Type:    TokenSSInstructionExport,
 				Content: "",
@@ -136,10 +125,13 @@ func (meaning *SmarstringInstructionMeaning) buildSmarstring(token *gotokenize.T
 			})
 
 			packToken.Children.AddToken(exportToken)
+
 		} else if childToken.Type == TokenSSLBreak {
+
 			packToken.Children.AddToken(gotokenize.Token{
 				Type: TokenSSInstructionReset,
 			})
+
 		} else {
 			// fmt.Println("--err token")
 			// childToken.Debug(0, SSNaming, &gotokenize.DebugOption{ExtendTypeSize: 6})
@@ -154,7 +146,6 @@ func (meaning *SmarstringInstructionMeaning) buildSmarstring(token *gotokenize.T
 	// 	ExtendTypeSize: 6,
 	// })
 	// fmt.Println("--end after  smartstring--")
-
 }
 
 //each instruction is a doToken, but we need determine the pre and post actions of the call
@@ -192,6 +183,7 @@ func (meaning *SmarstringInstructionMeaning) buildCommand(token *gotokenize.Toke
 	}
 
 	params := []gotokenize.Token{}
+	hasSquare := false
 	for {
 		childToken := iter.Read()
 		if childToken == nil {
@@ -251,6 +243,43 @@ func (meaning *SmarstringInstructionMeaning) buildCommand(token *gotokenize.Toke
 					sscontext.RegisterObject(address, CreateString(value))
 
 					params = append(params, paramToken)
+				} else if childToken2.Type == TokenSSLSquare {
+
+					fmt.Println("--square--")
+					childToken2.Debug(0, SSNaming, &gotokenize.DebugOption{ExtendTypeSize: 6})
+					fmt.Println("--end square--")
+					//obj := CreateSSStringMap()
+					pairIter := childToken2.Children.Iterator()
+					for {
+						pairToken := pairIter.Read()
+						if pairToken == nil {
+							break
+						}
+						if pairToken.Type == TokenSSLPair {
+							valToken := pairToken.Children.GetTokenAt(0)
+							if valToken.Type == TokenSSLString {
+								//obj.Set(pairToken.Content, CreateString(valToken.Children.ConcatStringContent()))
+							} else {
+								meaning.buildSmarstring(valToken, sscontext)
+								//pack := NewSSInstructionPack(*childToken2)
+								//obj.Set(pairToken.Content, pack)
+							}
+						} else {
+							fmt.Printf("not pair:%s\n", SSNaming(pairToken.Type))
+						}
+					}
+					//address := sscontext.IssueAddress()
+					//sscontext.RegisterObject(address, obj)
+					//paramToken := gotokenize.Token{
+					//	Type:    TokenSSRegistry,
+					//	Content: address,
+					//}
+					childToken2.Type = TokenSSInstructionBuildObject
+					params = append(params, *childToken2)
+					//fmt.Println("square in instruction meaning")
+					//obj.PrintDebug(0)
+					//fmt.Println("end square in instruction meaning")
+					hasSquare = true
 				}
 			}
 		}
@@ -284,6 +313,12 @@ func (meaning *SmarstringInstructionMeaning) buildCommand(token *gotokenize.Toke
 		fmt.Println("--end do--")
 	}
 	*token = newToken
+	if hasSquare {
+		fmt.Println("--begin square command--")
+		token.Debug(0, SSNaming, &gotokenize.DebugOption{ExtendTypeSize: 6})
+		fmt.Println("--end square command--")
+	}
+
 }
 
 func (meaning *SmarstringInstructionMeaning) GetMeaningLevel() int {
