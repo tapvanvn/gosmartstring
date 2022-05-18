@@ -34,7 +34,7 @@ func (obj *SSStringMap) Get(key string) IObject {
 }
 
 func (obj *SSStringMap) Set(key string, val IObject) {
-	fmt.Println("set:", gotokenize.ColorRed(key), "value:", getObjectPresent(val))
+	//fmt.Println("set:", gotokenize.ColorRed(key), "value:", getObjectPresent(val))
 	obj.Lock()
 	defer obj.Unlock()
 	obj.attributes[key] = val
@@ -54,13 +54,6 @@ func (obj *SSStringMap) Call(context *SSContext, name string, params []IObject) 
 
 	if iobj, ok := obj.attributes[attr]; ok {
 
-		if attr == "category_uuid" {
-			if iobj != nil {
-				fmt.Println("category _uuid", getObjectPresent(iobj))
-			} else {
-				fmt.Println("category _uuid nil")
-			}
-		}
 		return iobj
 	}
 

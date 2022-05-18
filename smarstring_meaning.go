@@ -29,37 +29,6 @@ func CreateSSMeaning() *SmarstringMeaning {
 	}
 }
 
-/*
-func (meaning *SmarstringMeaning) Prepare(process *gotokenize.MeaningProcess) {
-
-	meaning.AbstractMeaning.Prepare(process)
-
-	fmt.Println("--1.0--")
-	process.Stream.Debug(0, SSNaming, &gotokenize.DebugOption{
-		ExtendTypeSize: 6,
-	})
-	fmt.Println("--end 1.0--")
-
-	tmpStream := gotokenize.CreateStream(0)
-
-	for {
-		var token = meaning.AbstractMeaning.Next(process)
-		if token == nil {
-			break
-		}
-
-		if token.Type == TokenSSLSmartstring {
-			meaning.parseSmartstring(token)
-		}
-		tmpStream.AddToken(*token)
-	}
-	process.SetStream(process.Context.AncestorTokens, &tmpStream)
-	fmt.Println("--1.1--")
-	process.Stream.Debug(0, SSNaming, &gotokenize.DebugOption{
-		ExtendTypeSize: 6,
-	})
-	fmt.Println("--end 1.1--")
-}*/
 func (meaning *SmarstringMeaning) Next(process *gotokenize.MeaningProcess) *gotokenize.Token {
 	token := meaning.getNextMeaningToken(process)
 	// if token != nil {
@@ -223,9 +192,9 @@ func (meaning *SmarstringMeaning) parseParentThese(context *gotokenize.MeaningCo
 	}
 
 	parentToken.Children = tmpStream
-	fmt.Println("**parenthese**")
-	parentToken.Debug(0, SSNaming, &gotokenize.DebugOption{ExtendTypeSize: 6})
-	fmt.Println("**end parenthese**")
+	// fmt.Println("**parenthese**")
+	// parentToken.Debug(0, SSNaming, &gotokenize.DebugOption{ExtendTypeSize: 6})
+	// fmt.Println("**end parenthese**")
 }
 
 func (meaning *SmarstringMeaning) GetName() string {

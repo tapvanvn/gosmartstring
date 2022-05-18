@@ -183,7 +183,7 @@ func (meaning *SmarstringInstructionMeaning) buildCommand(token *gotokenize.Toke
 	}
 
 	params := []gotokenize.Token{}
-	hasSquare := false
+
 	for {
 		childToken := iter.Read()
 		if childToken == nil {
@@ -245,9 +245,6 @@ func (meaning *SmarstringInstructionMeaning) buildCommand(token *gotokenize.Toke
 					params = append(params, paramToken)
 				} else if childToken2.Type == TokenSSLSquare {
 
-					fmt.Println("--square--")
-					childToken2.Debug(0, SSNaming, &gotokenize.DebugOption{ExtendTypeSize: 6})
-					fmt.Println("--end square--")
 					//obj := CreateSSStringMap()
 					pairIter := childToken2.Children.Iterator()
 					for {
@@ -276,10 +273,7 @@ func (meaning *SmarstringInstructionMeaning) buildCommand(token *gotokenize.Toke
 					//}
 					childToken2.Type = TokenSSInstructionBuildObject
 					params = append(params, *childToken2)
-					//fmt.Println("square in instruction meaning")
-					//obj.PrintDebug(0)
-					//fmt.Println("end square in instruction meaning")
-					hasSquare = true
+
 				}
 			}
 		}
@@ -313,11 +307,6 @@ func (meaning *SmarstringInstructionMeaning) buildCommand(token *gotokenize.Toke
 		fmt.Println("--end do--")
 	}
 	*token = newToken
-	if hasSquare {
-		fmt.Println("--begin square command--")
-		token.Debug(0, SSNaming, &gotokenize.DebugOption{ExtendTypeSize: 6})
-		fmt.Println("--end square command--")
-	}
 
 }
 
