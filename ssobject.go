@@ -16,8 +16,16 @@ type IObject interface {
 	PrintDebug(level int)
 }
 
+func CreateSSObject(baseObject IObject) *SSObject {
+	return &SSObject{
+		baseObject:      baseObject,
+		extendFunctions: map[string]IFunction{},
+	}
+}
+
 //Object ssobject
 type SSObject struct {
+	baseObject      IObject
 	extendFunctions map[string]IFunction
 }
 
@@ -32,6 +40,7 @@ func (obj *SSObject) Export(context *SSContext) []byte {
 }
 
 func (obj *SSObject) GetType() string {
+
 	return "ssobject"
 }
 
@@ -55,6 +64,10 @@ func (obj *SSObject) Call(context *SSContext, name string, params []IObject) IOb
 	}
 	if sfunc, ok := obj.extendFunctions[name]; ok {
 
+		if obj.baseObject != nil {
+
+			return sfunc(context, obj.baseObject, params)
+		}
 		return sfunc(context, obj, params)
 	}
 	return nil

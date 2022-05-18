@@ -155,3 +155,10 @@ func SSNaming(tokenType int) string {
 }
 
 var EmptyParams []IObject = []IObject{}
+
+func GetType(obj IObject) string {
+	if obj == nil {
+		return "nil"
+	}
+	return obj.GetType()
+}

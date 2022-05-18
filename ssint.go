@@ -1,10 +1,12 @@
 package gosmartstring
 
 import (
+	crypto_rand "crypto/rand"
+	"encoding/binary"
+	"fmt"
 	"math"
 	"math/rand"
 	"strconv"
-	"time"
 )
 
 type SSInt struct {
@@ -12,12 +14,13 @@ type SSInt struct {
 	Value int64
 }
 
-func CreateSSInt(value int64) SSInt {
+func CreateSSInt(value int64) *SSInt {
 
-	ssint := SSInt{
-		IObject: &SSObject{},
-		Value:   value,
+	ssint := &SSInt{
+		//IObject: CreateSSObject(),
+		Value: value,
 	}
+	ssint.IObject = CreateSSObject(ssint)
 	ssint.Extend("random", ssintFuncRandom)
 	return ssint
 }
@@ -37,17 +40,27 @@ func (obj SSInt) GetType() string {
 }
 
 func ssintFuncRandom(context *SSContext, input IObject, params []IObject) IObject {
-	rand.Seed(int64(time.Now().Nanosecond()))
-	var max int64 = math.MaxInt64
-	if len(params) > 0 {
-		switch params[0].(type) {
-		case *SSString:
-			if test, err := strconv.ParseInt(params[0].(*SSString).Value, 10, 64); err == nil {
-				max = test
+	fmt.Println("call random int")
+	if ssint, ok := input.(*SSInt); ok {
+		var b [8]byte
+		crypto_rand.Read(b[:])
+		rand.Seed(int64(binary.LittleEndian.Uint64(b[:])))
+
+		var max int64 = math.MaxInt64
+		if len(params) > 0 {
+			switch params[0].(type) {
+			case *SSString:
+				if test, err := strconv.ParseInt(params[0].(*SSString).Value, 10, 64); err == nil {
+					max = test
+				}
+			case *SSInt:
+				max = params[0].(*SSInt).Value
 			}
-		case *SSInt:
-			max = params[0].(*SSInt).Value
 		}
+		ssint.Value = rand.Int63n(max)
+		fmt.Println("randomed", ssint.Value)
+		return ssint
 	}
-	return CreateSSInt(rand.Int63n(max))
+	fmt.Println("error input is not int", input.GetType())
+	return nil //TODO: return error
 }
