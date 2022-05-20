@@ -61,3 +61,32 @@ func (obj *SSArray) ToString() string {
 
 	return fmt.Sprintf("%v", obj.Stack)
 }
+
+type SSArrayIterator struct {
+	current int
+	size    int
+}
+
+func (iter *SSArrayIterator) IsEnd() bool {
+	return iter.current >= iter.size
+}
+func (obj *SSArray) Iterator() IIterator {
+	return &SSArrayIterator{
+		current: 0,
+		size:    len(obj.Stack),
+	}
+}
+
+func (obj *SSArray) Iterate(context *SSContext, iter IFunctionIterate, iterator IIterator, data interface{}) error {
+	if iterator.IsEnd() {
+		return nil
+	}
+	if ssIter, ok := iterator.(*SSArrayIterator); ok && ssIter.current < len(obj.Stack) {
+
+		if err := iter(context, CreateSSInt(int64(ssIter.current)), obj.Stack[ssIter.current], data); err != nil {
+			return err
+		}
+		ssIter.current++
+	}
+	return nil
+}

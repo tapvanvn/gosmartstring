@@ -2,6 +2,7 @@ package gosmartstring
 
 //func(context, input, param) output
 type IFunction func(context *SSContext, input IObject, params []IObject) IObject
+type IFunctionIterate func(context *SSContext, key IObject, val IObject, data interface{}) error
 
 //IObject interface for ssobject
 type IObject interface {
@@ -14,6 +15,14 @@ type IObject interface {
 	IsTrue() bool
 	ToString() string
 	PrintDebug(level int)
+}
+type IIterator interface {
+	IsEnd() bool
+}
+
+type IIterable interface {
+	Iterator() IIterator //create iterator
+	Iterate(context *SSContext, iterFunction IFunctionIterate, iterator IIterator, data interface{}) error
 }
 
 func CreateSSObject(baseObject IObject) *SSObject {

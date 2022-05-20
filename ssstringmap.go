@@ -91,3 +91,36 @@ func (obj *SSStringMap) PrintDebug(level int) {
 
 	}
 }
+
+type SSStringMapIterator struct {
+	keys    []string
+	current int
+}
+
+func (iter *SSStringMapIterator) IsEnd() bool {
+	return iter.current >= len(iter.keys)
+}
+func (obj *SSStringMap) Iterator() IIterator {
+	iter := &SSStringMapIterator{
+		current: 0,
+		keys:    make([]string, 0),
+	}
+	for key, _ := range obj.attributes {
+		iter.keys = append(iter.keys, key)
+	}
+	return iter
+}
+
+func (obj *SSStringMap) Iterate(context *SSContext, iter IFunctionIterate, iterator IIterator, data interface{}) error {
+	if iterator.IsEnd() {
+		return nil
+	}
+	if ssIter, ok := iterator.(*SSStringMapIterator); ok {
+		attName := ssIter.keys[ssIter.current]
+		if err := iter(context, CreateString(attName), obj.attributes[attName], data); err != nil {
+			return err
+		}
+		ssIter.current++
+	}
+	return nil
+}

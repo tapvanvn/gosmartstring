@@ -242,6 +242,12 @@ func (compiler *SSCompiler) compileCase(token *gotokenize.Token, context *SSCont
 	return nil
 }
 
+type compileIteratorContext struct {
+	iter         *gotokenize.Iterator
+	elementName  string
+	addressStack *SSAddressStack
+}
+
 func (compiler *SSCompiler) compileEach(token *gotokenize.Token, context *SSContext) error {
 	//#0 - array name
 	//#1 - output address
@@ -265,64 +271,105 @@ func (compiler *SSCompiler) compileEach(token *gotokenize.Token, context *SSCont
 	addressStack := CreateAddressStack()
 	context.SetStackRegistry(&addressStack)
 	offset := iter.Offset
-	switch arrayObject.Object.(type) {
-	case *SSArray:
-		array := arrayObject.Object.(*SSArray)
-
-		for i, element := range array.Stack {
-			context.RegisterObject("key", CreateSSInt(int64(i)))
-			context.RegisterObject(elementName, element)
-
-			iter.Seek(offset)
-
-			for {
-				childToken := iter.Read()
-				if childToken == nil {
-					break
-				}
-				//fmt.Println("compile:", SSNaming(childToken.Type))
-				if err := compiler.CompileToken(childToken, context); err != nil {
-					//TODO: should we issue an error token instead ?
-					fmt.Println("error", err.Error())
-					return err
-				}
-			}
-			addressStack.Inc()
-			context.This = nil //do not remember the child
-		}
-		break
-	case *SSStringMap:
-		array := arrayObject.Object.(*SSStringMap)
-
-		for key, element := range array.attributes {
-
-			context.RegisterObject("key", CreateString(key))
-			context.RegisterObject(elementName, element)
-
-			iter.Seek(offset)
-
-			for {
-				childToken := iter.Read()
-				if childToken == nil {
-					break
-				}
-				//fmt.Println("compile:", SSNaming(childToken.Type))
-				if err := compiler.CompileToken(childToken, context); err != nil {
-					//TODO: should we issue an error token instead ?
-					fmt.Println("error", err.Error())
-					return err
-				}
-			}
-			addressStack.Inc()
-			context.This = nil //do not remember the child
-		}
-		break
-	default:
-		return errors.New("instruction each error " + arrayName + " is not an array or string map")
+	iterable, ok := arrayObject.Object.(IIterable)
+	if !ok {
+		return errors.New("instruction each error " + arrayName + " is not iterable")
 	}
+	iterator := iterable.Iterator()
+	iterData := &compileIteratorContext{
+		iter:         iter,
+		elementName:  elementName,
+		addressStack: &addressStack,
+	}
+	for {
+		if iterator.IsEnd() {
+			break
+		}
+		iter.Seek(offset)
+		if err := iterable.Iterate(context, compiler.iterEach, iterator, iterData); err != nil {
+			context.SetStackRegistry(nil)
+			return err
+		}
+	}
+
+	/*
+		case *SSArray:
+			array := arrayObject.Object.(*SSArray)
+
+			for i, element := range array.Stack {
+				context.RegisterObject("key", CreateSSInt(int64(i)))
+				context.RegisterObject(elementName, element)
+
+				iter.Seek(offset)
+
+				for {
+					childToken := iter.Read()
+					if childToken == nil {
+						break
+					}
+					//fmt.Println("compile:", SSNaming(childToken.Type))
+					if err := compiler.CompileToken(childToken, context); err != nil {
+						//TODO: should we issue an error token instead ?
+						fmt.Println("error", err.Error())
+						return err
+					}
+				}
+				addressStack.Inc()
+				context.This = nil //do not remember the child
+			}
+			break
+		case *SSStringMap:
+			array := arrayObject.Object.(*SSStringMap)
+
+			for key, element := range array.attributes {
+
+				context.RegisterObject("key", CreateString(key))
+				context.RegisterObject(elementName, element)
+
+				iter.Seek(offset)
+
+				for {
+					childToken := iter.Read()
+					if childToken == nil {
+						break
+					}
+					//fmt.Println("compile:", SSNaming(childToken.Type))
+					if err := compiler.CompileToken(childToken, context); err != nil {
+						//TODO: should we issue an error token instead ?
+						fmt.Println("error", err.Error())
+						return err
+					}
+				}
+				addressStack.Inc()
+				context.This = nil //do not remember the child
+			}
+			break
+		default:
+			return errors.New("instruction each error " + arrayName + " is not an array or string map")
+		}*/
 
 	context.SetStackRegistry(nil)
 	context.StackResult(output.Type, output.Content, &addressStack)
+	return nil
+}
+func (compiler *SSCompiler) iterEach(context *SSContext, key IObject, value IObject, data interface{}) error {
+	iterContext := data.(*compileIteratorContext)
+	context.RegisterObject("key", key)
+	context.RegisterObject(iterContext.elementName, value)
+	for {
+		childToken := iterContext.iter.Read()
+		if childToken == nil {
+			break
+		}
+		//fmt.Println("compile:", SSNaming(childToken.Type))
+		if err := compiler.CompileToken(childToken, context); err != nil {
+			//TODO: should we issue an error token instead ?
+			fmt.Println("error", err.Error())
+			return err
+		}
+	}
+	iterContext.addressStack.Inc()
+	context.This = nil //do not remember the child
 	return nil
 }
 
