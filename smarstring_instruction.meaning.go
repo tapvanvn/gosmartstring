@@ -21,9 +21,9 @@ func CreateSSInstructionMeaning() *SmarstringInstructionMeaning {
 
 func (meaning *SmarstringInstructionMeaning) Next(proc *gotokenize.MeaningProcess) *gotokenize.Token {
 	token := meaning.getNextMeaningToken(proc)
-	if token != nil {
-		token.Debug(0, SSNaming, &gotokenize.DebugOption{ExtendTypeSize: 6})
-	}
+	// if token != nil {
+	// 	token.Debug(0, SSNaming, &gotokenize.DebugOption{ExtendTypeSize: 6})
+	// }
 
 	return token
 }

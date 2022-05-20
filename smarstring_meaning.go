@@ -1,8 +1,6 @@
 package gosmartstring
 
 import (
-	"fmt"
-
 	"github.com/tapvanvn/gotokenize/v2"
 )
 
@@ -87,7 +85,7 @@ func (meaning *SmarstringMeaning) parseCommand(context *gotokenize.MeaningContex
 }
 func (meaning *SmarstringMeaning) parseSquare(context *gotokenize.MeaningContext, parentToken *gotokenize.Token) {
 
-	fmt.Println(gotokenize.ColorRed("parsing Square"))
+	//fmt.Println(gotokenize.ColorRed("parsing Square"))
 	iter := parentToken.Children.Iterator()
 	tmpStream := gotokenize.CreateStream(meaning.GetMeaningLevel())
 
