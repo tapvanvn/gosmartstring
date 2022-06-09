@@ -85,6 +85,11 @@ func (obj *SSObject) Call(context *SSContext, name string, params []IObject) IOb
 		}
 	}
 	if obj.objInterface != nil {
+
+		if obj.baseObject != nil {
+
+			return obj.objInterface.Call(context, obj.baseObject, name, params)
+		}
 		return obj.objInterface.Call(context, obj, name, params)
 	}
 	return nil
