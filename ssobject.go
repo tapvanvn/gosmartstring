@@ -11,7 +11,7 @@ type IObject interface {
 	GetType() string
 	GetExtendFunc() map[string]IFunction
 	Call(context *SSContext, name string, params []IObject) IObject
-	Extend(functionName string, sfunc IFunction)
+	//Extend(functionName string, sfunc IFunction)
 	IsTrue() bool
 	ToString() string
 	PrintDebug(level int)
@@ -25,17 +25,35 @@ type IIterable interface {
 	Iterate(context *SSContext, iterFunction IFunctionIterate, iterator IIterator, data interface{}) error
 }
 
-func CreateSSObject(baseObject IObject) *SSObject {
-	return &SSObject{
-		baseObject:      baseObject,
-		extendFunctions: map[string]IFunction{},
+func ssFuncExportJson(context *SSContext, input IObject, params []IObject) IObject {
+	if input.CanExport() {
+		content := string(input.Export(context))
+		return CreateSSJSON(content)
 	}
+	return nil
+}
+
+var SSObjectInterface = &SSInterface{
+	functions: map[string]IFunction{
+		"json": ssFuncExportJson,
+	},
+}
+
+func CreateSSObject(baseObject IObject, objInterface *SSInterface) *SSObject {
+	obj := &SSObject{
+		baseObject:   baseObject,
+		objInterface: objInterface,
+	}
+	if objInterface == nil {
+		obj.objInterface = SSObjectInterface
+	}
+	return obj
 }
 
 //Object ssobject
 type SSObject struct {
-	baseObject      IObject
-	extendFunctions map[string]IFunction
+	baseObject   IObject
+	objInterface *SSInterface
 }
 
 //MARK: implement IObject
@@ -55,12 +73,7 @@ func (obj *SSObject) GetType() string {
 
 func (obj *SSObject) GetExtendFunc() map[string]IFunction {
 
-	return obj.extendFunctions
-}
-
-func (obj *SSObject) Extend(functionName string, sfunc IFunction) {
-
-	obj.extendFunctions[functionName] = sfunc
+	return obj.objInterface.functions
 }
 
 func (obj *SSObject) Call(context *SSContext, name string, params []IObject) IObject {
@@ -71,13 +84,8 @@ func (obj *SSObject) Call(context *SSContext, name string, params []IObject) IOb
 			return CreateSSJSON(content)
 		}
 	}
-	if sfunc, ok := obj.extendFunctions[name]; ok {
-
-		if obj.baseObject != nil {
-
-			return sfunc(context, obj.baseObject, params)
-		}
-		return sfunc(context, obj, params)
+	if obj.objInterface != nil {
+		return obj.objInterface.Call(context, obj, name, params)
 	}
 	return nil
 }

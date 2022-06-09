@@ -14,14 +14,16 @@ type SSInt struct {
 	Value int64
 }
 
+var SSIntInterface = SSObjectInterface.Extend(map[string]IFunction{
+	"random": ssintFuncRandom,
+})
+
 func CreateSSInt(value int64) *SSInt {
 
 	ssint := &SSInt{
-		//IObject: CreateSSObject(),
-		Value: value,
+		IObject: CreateSSObject(nil, SSIntInterface),
+		Value:   value,
 	}
-	ssint.IObject = CreateSSObject(ssint)
-	ssint.Extend("random", ssintFuncRandom)
 	return ssint
 }
 
