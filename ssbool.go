@@ -5,8 +5,8 @@ type SSBool struct {
 	Value bool
 }
 
-func CreateBool(value bool) SSBool {
-	return SSBool{
+func CreateBool(value bool) *SSBool {
+	return &SSBool{
 		IObject: &SSObject{},
 		Value:   value,
 	}

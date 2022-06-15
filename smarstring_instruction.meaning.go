@@ -77,8 +77,13 @@ func (meaning *SmarstringInstructionMeaning) buildSmarstring(token *gotokenize.T
 		}
 		if childToken.Type == TokenSSLWord {
 
-			meaning.buildDoInstruction(childToken, "", sscontext)
-			packToken.Children.AddToken(*childToken)
+			//TODO: keywork system here
+			if childToken.Content == "false" || childToken.Content == "true" {
+				//Actually, cannot use false and true with out context.
+			} else {
+				meaning.buildDoInstruction(childToken, "", sscontext)
+				packToken.Children.AddToken(*childToken)
+			}
 
 		} else if childToken.Type == TokenSSLCommand {
 
@@ -219,9 +224,25 @@ func (meaning *SmarstringInstructionMeaning) buildCommand(token *gotokenize.Toke
 
 				} else if childToken2.Type == TokenSSLWord {
 
-					address := sscontext.IssueAddress()
-					meaning.buildDoInstruction(childToken2, address, sscontext)
-					params = append(params, *childToken2)
+					//TODO: keyword system here
+					if childToken2.Content == "false" || childToken2.Content == "true" {
+						address := sscontext.IssueAddress()
+						paramToken := gotokenize.Token{
+							Type:    TokenSSRegistry,
+							Content: address,
+						}
+						if childToken2.Content == "false" {
+							sscontext.RegisterObject(address, CreateBool(false))
+						} else {
+							sscontext.RegisterObject(address, CreateBool(true))
+						}
+						params = append(params, paramToken)
+
+					} else {
+						address := sscontext.IssueAddress()
+						meaning.buildDoInstruction(childToken2, address, sscontext)
+						params = append(params, *childToken2)
+					}
 
 				} else if childToken2.Type == TokenSSLString {
 
